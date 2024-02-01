@@ -21,28 +21,32 @@ export const navItems = [
 ];
 
 export function UserNav({
-  name,
+  givenName,
+  familyName,
   email,
   image,
 }: {
-  name: string;
+  givenName: string;
+  familyName: string;
   email: string;
   image: string;
 }) {
+
+  const initials = givenName.charAt(0) + familyName.charAt(0);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10 rounded-full">
             <AvatarImage src={image} alt="" />
-            <AvatarFallback>Jan</AvatarFallback>
+            <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{name}</p>
+            <p className="text-sm font-medium leading-none">{givenName}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {email}
             </p>
