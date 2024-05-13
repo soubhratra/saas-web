@@ -5,25 +5,56 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator zod {
+  provider          = "zod-prisma-types"
+  useTypeAssertions = "true"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  disabled = "true"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
+enum UserRole {
+  User
+  Admin
+  Support
+}
+
+enum AccountStatus {
+  Pending
+  Active
+  Inactive
+  Password_Reset_Required
+}
+
 model User {
-  id               String        @id @unique
-  name             String?
-  email            String        @unique
-  stripeCustomerId String?       @unique
-  colorScheme      String        @default("theme-blue")
-  Subscription     Subscription?
-  Notes            Note[]
+  id                     String               @id @default(uuid())
+  /// @zod.string.min(3, { message: "First name must be at least 3 characters long." }).max(50, { message: "First name must not exceed 50 characters." })
+  given_name             String
+  /// @zod.string.min(3, { message: "Last name must be at least 3 characters long." }).max(50, { message: "Last name must not exceed 50 characters." })
+  family_name            String
+  /// @zod.string.email()
+  email                  String               @unique
+  /// @zod.string.min(6, { message: "Password must be at least 6 characters long." }).max(50, { message: "Password must not exceed 50 characters." })
+  password               String
+  stripeCustomerId       String?              @unique
+  userRole               UserRole             @default(User)
+  accountStatus          AccountStatus        @default(Pending)
+  Subscription           Subscription?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @default(now())
 }
 
 model Subscription {
   stripeSubscriptionId String   @id @unique
-  invterval            String
+  interval            String
   status               String
   planId               String
   currentPeriodStart   Int
@@ -34,14 +65,7 @@ model Subscription {
   userId               String   @unique
 }
 
-model Note {
-  id          String @id @default(uuid())
-  title       String
-  description String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  User   User?   @relation(fields: [userId], references: [id])
-  userId String?
+model AppConfig {
+  id            String @id @default(uuid())
+  maxActiveUser Int
 }
