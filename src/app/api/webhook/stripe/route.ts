@@ -37,6 +37,9 @@ export async function POST(req: Request) {
 
     if (!user) throw new Error("User not found...");
 
+    const planName = subscription.items.data[0].plan.nickname;
+    console.log("plan1", planName);
+
     await prisma.subscription.create({
       data: {
         stripeSubscriptionId: subscription.id,
@@ -45,15 +48,43 @@ export async function POST(req: Request) {
         currentPeriodEnd: subscription.current_period_end,
         status: subscription.status,
         planId: subscription.items.data[0].plan.id,
-        interval: String(subscription.items.data[0].plan.interval),
+        interval: String(subscription.items.data[0].plan),
+        planName: planName,
       },
     });
+  }
+
+  if (event.type === "customer.subscription.updated") {
+    const subscription = event.data.object as Stripe.Subscription;
+    const updateRecord = await prisma.subscription.findFirst({
+      where: { stripeSubscriptionId: subscription.id },
+    });
+
+    const planName = subscription.items.data[0].plan.nickname;
+    console.log("plan2", planName);
+    
+    if (updateRecord) {
+      await prisma.subscription.update({
+        where: { stripeSubscriptionId: subscription.id },
+        data: {
+          planId: subscription.items.data[0].price.id,
+          currentPeriodStart: subscription.current_period_start,
+          currentPeriodEnd: subscription.current_period_end,
+          status: subscription.status,
+          interval: String(subscription.items.data[0].plan.interval),
+          planName: planName,
+        },
+      });
+    }
   }
 
   if (event.type === "invoice.payment_succeeded") {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     );
+
+    const planName = subscription.items.data[0].plan.nickname;
+    console.log("plan3", planName);
 
     const updateRecord = await prisma.subscription.findFirst({
       where:{stripeSubscriptionId: subscription?.id}
@@ -68,6 +99,7 @@ export async function POST(req: Request) {
           currentPeriodStart: subscription.current_period_start,
           currentPeriodEnd: subscription.current_period_end,
           status: subscription.status,
+          planName: planName,
         },
       });
     }
