@@ -3,11 +3,19 @@ import { headers } from "next/headers";
 import Stripe from "stripe";
 import prisma from "@/app/lib/db";
 
+async function getPlanNameFromProductId(productId: string): Promise<string> {
+  try {
+    const product = await stripe.products.retrieve(productId);
+    return product.name || "Unknown";
+  } catch (error) {
+    console.error("Error retrieving product:", error);
+    return "Unknown";
+  }
+}
+
 export async function POST(req: Request) {
   const body = await req.text();
-
   const signature = headers().get("Stripe-Signature") as string;
-
   let event: Stripe.Event;
 
   try {
@@ -22,23 +30,22 @@ export async function POST(req: Request) {
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
-   
+
   if (event.type === "checkout.session.completed") {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     );
     const customerId = String(session.customer);
-
-    const user = await prisma.user.findUnique({
+    const product = subscription?.items?.data[0]?.plan?.product;
+    const planName = typeof product === 'string' ? await getPlanNameFromProductId(product) : 'Unknown';
+      console.log(planName , "Plan one ")
+      const user = await prisma.user.findUnique({
       where: {
         stripeCustomerId: customerId,
       },
     });
 
     if (!user) throw new Error("User not found...");
-
-    const planName = subscription.items.data[0].plan.nickname;
-    console.log("plan1", planName);
 
     await prisma.subscription.create({
       data: {
@@ -48,8 +55,8 @@ export async function POST(req: Request) {
         currentPeriodEnd: subscription.current_period_end,
         status: subscription.status,
         planId: subscription.items.data[0].plan.id,
-        interval: String(subscription.items.data[0].plan),
-        planName: planName,
+        interval: String(subscription.items.data[0].plan.interval),
+        planName: planName
       },
     });
   }
@@ -59,10 +66,9 @@ export async function POST(req: Request) {
     const updateRecord = await prisma.subscription.findFirst({
       where: { stripeSubscriptionId: subscription.id },
     });
-
-    const planName = subscription.items.data[0].plan.nickname;
-    console.log("plan2", planName);
-    
+    const product = subscription?.items?.data[0]?.plan?.product;
+    const planName =   typeof product === 'string' ? await getPlanNameFromProductId(product) : 'Unknown';
+    console.log(planName , "Plane Two")
     if (updateRecord) {
       await prisma.subscription.update({
         where: { stripeSubscriptionId: subscription.id },
@@ -72,7 +78,7 @@ export async function POST(req: Request) {
           currentPeriodEnd: subscription.current_period_end,
           status: subscription.status,
           interval: String(subscription.items.data[0].plan.interval),
-          planName: planName,
+          planName: planName
         },
       });
     }
@@ -82,14 +88,14 @@ export async function POST(req: Request) {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     );
-
-    const planName = subscription.items.data[0].plan.nickname;
-    console.log("plan3", planName);
-
+    const product = subscription?.items?.data[0]?.plan?.product;
+    const planName = typeof product === 'string' ? await getPlanNameFromProductId(product) : 'Unknown';
+    console.log("I am update", planName);
     const updateRecord = await prisma.subscription.findFirst({
-      where:{stripeSubscriptionId: subscription?.id}
-    })
-    if(updateRecord){
+      where: { stripeSubscriptionId: subscription?.id }
+    });
+
+    if (updateRecord) {
       await prisma.subscription.update({
         where: {
           stripeSubscriptionId: subscription.id,
@@ -99,7 +105,7 @@ export async function POST(req: Request) {
           currentPeriodStart: subscription.current_period_start,
           currentPeriodEnd: subscription.current_period_end,
           status: subscription.status,
-          planName: planName,
+          planName: planName
         },
       });
     }

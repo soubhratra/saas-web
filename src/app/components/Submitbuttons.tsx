@@ -45,12 +45,12 @@ export function StripePortal() {
   return (
     <>
       {pending ? (
-        <Button disabled className="w-fit">
+        <Button disabled className="w-full">
           <Loader2 className="mr-2 w-4 h-4 animate-spin" /> Please Wait
         </Button>
       ) : (
-        <Button className="w-fit" type="submit">
-          View payment details
+        <Button className="w-full" type="submit">
+          MANAGE SUBSCRIPTION
         </Button>
       )}
     </>
