@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from 'sonner';
+import Chatbot from "./components/chatbot";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default async function RootLayout({
       <body
         className={`${inter.className} ${"theme-default"}`}
       >
+        <Chatbot/>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
