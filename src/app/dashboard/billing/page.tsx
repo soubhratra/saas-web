@@ -1,0 +1,425 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { CheckCircle2 } from "lucide-react";
+import prisma from "@/app/lib/db";
+import { getStripeSessionStarter, getStripeSessionPro, getStripeSessionPremium, stripe } from "@/app/lib/stripe";
+import { redirect } from "next/navigation";
+import {
+  StripePortal,
+  StripeSubscriptionCreationButton,
+} from "@/app/components/Submitbuttons";
+import { unstable_noStore as noStore } from "next/cache";
+import { auth } from "@/auth";
+import { getUserByEmail } from "@/app/api/auth/data";
+
+const featureItems = [
+  { name: "Lorem Ipsum something" },
+  { name: "Lorem Ipsum something" },
+  { name: "Lorem Ipsum something" },
+  { name: "Lorem Ipsum something" },
+  { name: "Lorem Ipsum something" },
+];
+
+async function getData(userId: string) {
+  noStore();
+  const data = await prisma.subscription.findUnique({
+    where: {
+      userId: userId,
+    },
+    select: {
+      planName: true,
+      status: true,
+      user: {
+        select: {
+          stripeCustomerId: true,
+        },
+      },
+    },
+  });
+
+  return data;
+}
+
+export default async function BillingPage() {
+  const session = await auth();
+  const email: string = session?.user?.email!;
+  const user = await getUserByEmail(email);
+  const data = await getData(user?.id as string);
+
+  async function createSubscriptionStarter() {
+    "use server";
+
+    const dbUser = await prisma.user.findUnique({
+      where: {
+        id: user?.id,
+      },
+      select: {
+        stripeCustomerId: true,
+      },
+    });
+
+    if (!dbUser?.stripeCustomerId) {
+      throw new Error("Unable to get customer id");
+    }
+
+    const subscriptionUrlStarter = await getStripeSessionStarter({
+      customerId: dbUser.stripeCustomerId,
+      domainUrl:
+        process.env.NODE_ENV == "production"
+          ? (process.env.PRODUCTION_URL as string)
+          : "http://localhost:3000",
+      priceId: process.env.STRIPE_PRICE_ID_STARTER as string,
+    });
+
+    return redirect(subscriptionUrlStarter);
+  }
+
+  async function createSubscriptionPro() {
+    "use server";
+
+    const dbUser = await prisma.user.findUnique({
+      where: {
+        id: user?.id,
+      },
+      select: {
+        stripeCustomerId: true,
+      },
+    });
+
+    if (!dbUser?.stripeCustomerId) {
+      throw new Error("Unable to get customer id");
+    }
+
+    const subscriptionUrlPro = await getStripeSessionPro({
+      customerId: dbUser.stripeCustomerId,
+      domainUrl:
+        process.env.NODE_ENV == "production"
+          ? (process.env.PRODUCTION_URL as string)
+          : "http://localhost:3000",
+      priceId: process.env.STRIPE_PRICE_ID_PRO as string,
+    });
+
+    return redirect(subscriptionUrlPro);
+  }
+
+  async function createSubscriptionPremium() {
+    "use server";
+
+    const dbUser = await prisma.user.findUnique({
+      where: {
+        id: user?.id,
+      },
+      select: {
+        stripeCustomerId: true,
+      },
+    });
+
+    if (!dbUser?.stripeCustomerId) {
+      throw new Error("Unable to get customer id");
+    }
+
+    const subscriptionUrlPremium = await getStripeSessionPremium({
+      customerId: dbUser.stripeCustomerId,
+      domainUrl:
+        process.env.NODE_ENV == "production"
+          ? (process.env.PRODUCTION_URL as string)
+          : "http://localhost:3000",
+      priceId: process.env.STRIPE_PRICE_ID_PREMIUM as string,
+    });
+
+    return redirect(subscriptionUrlPremium);
+  }
+
+  async function createCustomerPortal() {
+    "use server";
+    const session = await stripe.billingPortal.sessions.create({
+      customer: data?.user.stripeCustomerId as string,
+      return_url:
+        process.env.NODE_ENV === "production"
+          ? (process.env.PRODUCTION_URL as string)
+          : "http://localhost:3000/dashboard",
+    });
+
+    return redirect(session.url);
+  }
+  console.log("data?.status", data?.status);
+  
+  if (data?.status === "active") {
+    return (
+
+      <div className="grid items-start gap-8">
+        <div className="flex items-center justify-between px-2">
+          <div className="grid gap-1">
+            <h1 className="text-3xl md:text-4xl ">Subscription</h1>
+            <p className="text-lg text-muted-foreground">
+              Settings regarding your subscription
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-row gap-4">
+          <div className="max-w-md mx-auto space-y-4">
+            <Card className="flex flex-col mb-8">
+              <CardContent className="py-8">
+                <div>
+                  <h3 className="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-primary/10 text-primary">
+                    Starter
+                  </h3>
+                </div>
+                {data.planName === 'Starter' ? (
+                  <p className="mt-2">Active Plan</p>
+                ) : (
+                  <></>
+                )}
+
+                <div className="mt-4 flex items-baseline text-6xl font-extrabold">
+                  $30 <span className="ml-1 text-2xl text-muted-foreground">/mo</span>
+                </div>
+                <p className="mt-5 text-lg text-muted-foreground">
+                  Write as many notes as you want for $30 a Month
+                </p>
+              </CardContent>
+              <div className="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 bg-secondary rounded-lg m-1 mx-6 mb-6 space-y-6 sm:p-10 sm:pt-6 sm:pl-6 sm:pr-6">
+                <ul className="space-y-4">
+                  {featureItems.map((item, index) => (
+                    <li key={index} className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <CheckCircle2 className="h-6 w-6 text-primary" />
+                      </div>
+                      <p className="ml-3 text-base">{item.name}</p>
+                    </li>
+                  ))}
+                </ul>
+                {data.planName === 'Starter' ? (
+                  <form className="w-full" action={createCustomerPortal}>
+                    <StripePortal />
+                  </form>
+                ) : (
+                  <form className="w-full" action={createSubscriptionPremium}>
+                    <StripeSubscriptionCreationButton />
+                  </form>
+                )}
+              </div>
+            </Card>
+          </div>
+          <div className="max-w-md mx-auto space-y-4">
+            <Card className="flex flex-col mb-8">
+              <CardContent className="py-8">
+                <div>
+                  <h3 className="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-primary/10 text-primary">
+                    Pro
+                  </h3>
+                </div>
+                {data.planName === 'Pro' ? (
+                  <p className="mt-2">Active Plan</p>
+                ) : (
+                  <></>
+                )}
+
+                <div className="mt-4 flex items-baseline text-6xl font-extrabold">
+                  $60 <span className="ml-1 text-2xl text-muted-foreground">/mo</span>
+                </div>
+                <p className="mt-5 text-lg text-muted-foreground">
+                  Write as many notes as you want for $90 a Month
+                </p>
+              </CardContent>
+              <div className="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 bg-secondary rounded-lg m-1 mx-6 mb-6 space-y-6 sm:p-10 sm:pt-6 sm:pl-6 sm:pr-6">
+                <ul className="space-y-4">
+                  {featureItems.map((item, index) => (
+                    <li key={index} className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <CheckCircle2 className="h-6 w-6 text-primary" />
+                      </div>
+                      <p className="ml-3 text-base">{item.name}</p>
+                    </li>
+                  ))}
+                </ul>
+                
+                {data.planName === 'Pro' ? (
+                  <form action={createCustomerPortal}>
+                    <StripePortal />
+                  </form>
+                ) : (
+                  <form className="w-full" action={createSubscriptionPremium}>
+                    <StripeSubscriptionCreationButton />
+                  </form>
+                )}
+              </div>
+            </Card>
+          </div>
+          <div className="max-w-md mx-auto space-y-4">
+            <Card className="flex flex-col mb-8">
+              <CardContent className="py-8">
+                <div>
+                  <h3 className="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-primary/10 text-primary">
+                    Premium
+                  </h3>
+                </div>
+                {data.planName === 'Premium' ? (
+                  <p className="mt-2">Active Plan</p>
+                ) : (
+                  <></>
+                )}
+
+                <div className="mt-4 flex items-baseline text-6xl font-extrabold">
+                  $90 <span className="ml-1 text-2xl text-muted-foreground">/mo</span>
+                </div>
+                <p className="mt-5 text-lg text-muted-foreground">
+                  Write as many notes as you want for $90 a Month
+                </p>
+              </CardContent>
+              <div className="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 bg-secondary rounded-lg m-1 mx-6 mb-6 space-y-6 sm:p-10 sm:pt-6 sm:pl-6 sm:pr-6">
+                <ul className="space-y-4">
+                  {featureItems.map((item, index) => (
+                    <li key={index} className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <CheckCircle2 className="h-6 w-6 text-primary" />
+                      </div>
+                      <p className="ml-3 text-base">{item.name}</p>
+                    </li>
+                  ))}
+                </ul>
+
+                {data.planName === 'Premium' ? (
+                  <form action={createCustomerPortal}>
+                    <StripePortal />
+                  </form>
+                ) : (
+                  <form className="w-full" action={createSubscriptionPremium}>
+                    <StripeSubscriptionCreationButton />
+                  </form>
+                )}
+              </div>
+            </Card>
+          </div>
+        </div>
+        {/* <Card className="w-full lg:w-2/3">
+          <CardHeader>
+            <CardTitle>Edit Subscription</CardTitle>
+            <CardDescription>
+              Click on the button below, this will give you the opportunity to
+              change your payment details and view your statement at the same
+              time.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form action={createCustomerPortal}>
+              <StripePortal />
+            </form>
+          </CardContent>
+        </Card> */}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-row gap-4">
+      <div className="max-w-md mx-auto space-y-4">
+        <Card className="flex flex-col mb-8">
+          <CardContent className="py-8">
+            <div>
+              <h3 className="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-primary/10 text-primary">
+                Starter
+              </h3>
+            </div>
+
+            <div className="mt-4 flex items-baseline text-6xl font-extrabold">
+              $30 <span className="ml-1 text-2xl text-muted-foreground">/mo</span>
+            </div>
+            <p className="mt-5 text-lg text-muted-foreground">
+              Write as many notes as you want for $30 a Month
+            </p>
+          </CardContent>
+          <div className="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 bg-secondary rounded-lg m-1 mx-6 mb-6 space-y-6 sm:p-10 sm:pt-6 sm:pl-6 sm:pr-6">
+            <ul className="space-y-4">
+              {featureItems.map((item, index) => (
+                <li key={index} className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <CheckCircle2 className="h-6 w-6 text-primary" />
+                  </div>
+                  <p className="ml-3 text-base">{item.name}</p>
+                </li>
+              ))}
+            </ul>
+
+            <form className="w-full" action={createSubscriptionStarter}>
+              <StripeSubscriptionCreationButton />
+            </form>
+          </div>
+        </Card>
+      </div>
+      <div className="max-w-md mx-auto space-y-4">
+        <Card className="flex flex-col mb-8">
+          <CardContent className="py-8">
+            <div>
+              <h3 className="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-primary/10 text-primary">
+                Pro
+              </h3>
+            </div>
+
+            <div className="mt-4 flex items-baseline text-6xl font-extrabold">
+              $60 <span className="ml-1 text-2xl text-muted-foreground">/mo</span>
+            </div>
+            <p className="mt-5 text-lg text-muted-foreground">
+              Write as many notes as you want for $90 a Month
+            </p>
+          </CardContent>
+          <div className="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 bg-secondary rounded-lg m-1 mx-6 mb-6 space-y-6 sm:p-10 sm:pt-6 sm:pl-6 sm:pr-6">
+            <ul className="space-y-4">
+              {featureItems.map((item, index) => (
+                <li key={index} className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <CheckCircle2 className="h-6 w-6 text-primary" />
+                  </div>
+                  <p className="ml-3 text-base">{item.name}</p>
+                </li>
+              ))}
+            </ul>
+
+            <form className="w-full" action={createSubscriptionPro}>
+              <StripeSubscriptionCreationButton />
+            </form>
+          </div>
+        </Card>
+      </div>
+      <div className="max-w-md mx-auto space-y-4">
+        <Card className="flex flex-col mb-8">
+          <CardContent className="py-8">
+            <div>
+              <h3 className="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-primary/10 text-primary">
+                Premium
+              </h3>
+            </div>
+
+            <div className="mt-4 flex items-baseline text-6xl font-extrabold">
+              $90 <span className="ml-1 text-2xl text-muted-foreground">/mo</span>
+            </div>
+            <p className="mt-5 text-lg text-muted-foreground">
+              Write as many notes as you want for $90 a Month
+            </p>
+          </CardContent>
+          <div className="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 bg-secondary rounded-lg m-1 mx-6 mb-6 space-y-6 sm:p-10 sm:pt-6 sm:pl-6 sm:pr-6">
+            <ul className="space-y-4">
+              {featureItems.map((item, index) => (
+                <li key={index} className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <CheckCircle2 className="h-6 w-6 text-primary" />
+                  </div>
+                  <p className="ml-3 text-base">{item.name}</p>
+                </li>
+              ))}
+            </ul>
+
+            <form className="w-full" action={createSubscriptionPremium}>
+              <StripeSubscriptionCreationButton />
+            </form>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
