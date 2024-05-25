@@ -1,12 +1,31 @@
 import { redirect } from "next/navigation";
 import { Navbar } from "./components/Navbar";
 import { auth } from "@/auth";
+import { client  } from "./lib/sanity";
+
+async function getBlogData() {
+  console.log("entered");
+  const blogQuery = `*[_type == 'blog'] | order(_createdAt desc) {
+    title,
+      smallDescription,
+      "currentSlug": slug.current
+  }`;
+
+  const data = await client.fetch(blogQuery);
+  console.log("data", data);
+
+  return data;
+}
 
 export default async function Home() {
 
   if (await auth()) {
+    const blogData = await getBlogData();
+    console.log("blogData", blogData);
+
     return redirect("/dashboard");
   }
+  
   return (
     <>
     <Navbar/>
