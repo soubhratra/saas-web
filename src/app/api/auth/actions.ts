@@ -1,13 +1,13 @@
 "use server";
 
 import prisma from "@/app/lib/db";
-import { unstable_noStore as noStore } from "next/cache";
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '../../../auth';
 import { getVerifiedUserByEmail } from "./data";
 import { LoginSchema, ProfileUpdateSchema } from '@/app/api/auth/authValidationSchema';
 import { AuthError } from "next-auth";
+import { client } from "@/app/lib/sanity";
 
 export async function authenticate(
   prevState: string | undefined,
@@ -77,4 +77,23 @@ export async function updateProfile(email: string, formData: { name: string, ema
   }
   revalidatePath('/dashboard/profile');
   redirect('/dashboard/profile');
+}
+
+export async function getBlogData() {
+  try {
+    console.log('Fetching blog data...');
+    const blogQuery = `*[_type == 'blog'] | order(_createdAt desc) {
+      title,
+      smallDescription,
+      "currentSlug": slug.current,
+      titleImage
+    }`;
+
+    const data = await client.fetch(blogQuery);
+    console.log('Data fetched successfully:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching blog data:', error);
+    return [];
+  }
 }

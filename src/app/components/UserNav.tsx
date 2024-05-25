@@ -14,13 +14,13 @@ import Link from "next/link";
 import { LogoutButton } from "./LogoutButton";
 
 export const navItems = [
-  { name: "The VEYE Program", href: "/dashboard", icon: Home },
+  { name: "Home", href: "/dashboard", icon: Home },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export const navItemsAdmin = [
-  { name: "The VEYE Program", href: "/dashboard", icon: Home },
+  { name: "Home", href: "/dashboard", icon: Home },
   { name: "Admin", href: "/dashboard/admin/users", icon: Monitor },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
