@@ -9,12 +9,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CreditCard, Home, Settings, Monitor } from "lucide-react";
+import { CreditCard, Home, Settings, Monitor, NotebookIcon } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "./LogoutButton";
 
 export const navItems = [
   { name: "Home", href: "/dashboard", icon: Home },
+  { name: "Blog", href: "/dashboard/blog", icon: NotebookIcon },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
@@ -22,6 +23,7 @@ export const navItems = [
 export const navItemsAdmin = [
   { name: "Home", href: "/dashboard", icon: Home },
   { name: "Admin", href: "/dashboard/admin/users", icon: Monitor },
+  { name: "Blog", href: "/dashboard/blog", icon: NotebookIcon },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
