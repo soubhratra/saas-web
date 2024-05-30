@@ -7,6 +7,15 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import prisma from "@/app/lib/db";
 import { SubmitButton } from "@/app/components/Submitbuttons";
 import { revalidatePath, unstable_noStore as noStore } from "next/cache";
@@ -23,6 +32,7 @@ export default async function SettingPage() {
 
     const givenName = formData.get("firstName") as string;
     const familyName = formData.get("lastName") as string;
+    const colorScheme = formData.get("color") as string;
 
     noStore();
 
@@ -33,6 +43,7 @@ export default async function SettingPage() {
       data: {
         given_name: givenName ?? undefined,
         family_name: familyName ?? undefined,
+        colorScheme: colorScheme ?? undefined,
       },
     });
 
@@ -86,6 +97,27 @@ export default async function SettingPage() {
                   disabled
                   defaultValue={user?.email as string}
                 />
+              </div>
+
+              <div className="space-y-1">
+                <Label>Color Scheme</Label>
+                <Select name="color" defaultValue={user?.colorScheme}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a color" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Color</SelectLabel>
+                      <SelectItem value="theme-green">Green</SelectItem>
+                      <SelectItem value="theme-blue">Blue</SelectItem>
+                      <SelectItem value="theme-violet">Violet</SelectItem>
+                      <SelectItem value="theme-yellow">Yellow</SelectItem>
+                      <SelectItem value="theme-orange">Orange</SelectItem>
+                      <SelectItem value="theme-red">Red</SelectItem>
+                      <SelectItem value="theme-rose">Rose</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardContent>
