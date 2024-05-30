@@ -1,28 +1,54 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Roboto } from 'next/font/google'
 import "./globals.css";
 import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from 'sonner';
 import Chatbot from "./components/chatbot";
+import { unstable_noStore as noStore } from "next/cache";
+import prisma from "@/app/lib/db";
+import { auth } from "@/auth";
+import { getUserByEmail } from "@/app/api/auth/data";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
+const roboto = Roboto({
+  weight: '400',
+  subsets: ['latin'],
+})
 
 export const metadata: Metadata = {
   title: "Veye",
   description: "Veye - Revolutionizing Healthcare through nutrition",
 };
 
-
+async function getData(userId: string) {
+  noStore();
+  if (userId) {
+    const data = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        colorScheme: true,
+      },
+    });
+    return data;
+  }
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+  const email: string = session?.user?.email!;
+  const user = await getUserByEmail(email);
+  
   return (
     <html lang="en">
       <body
-        className={`${inter.className} ${"theme-default"}`}
+        // className={`${roboto.className} ${"theme-green"}`}
+        className={`${roboto.className} ${user?.colorScheme ?? "theme-default"}`}
       >
         <Chatbot/>
         <ThemeProvider

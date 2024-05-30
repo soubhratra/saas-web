@@ -50,6 +50,7 @@ model User {
   Subscription           Subscription?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @default(now())
+  colorScheme            String               @default("theme-orange")
 }
 
 model Subscription {

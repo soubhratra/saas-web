@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "./Themetoggle";
 import { Button } from "@/components/ui/button";
 import { UserNav, UserNavAdmin } from "./UserNav";
 import { auth } from "@/auth";
@@ -28,6 +29,7 @@ export async function Navbar() {
         </Link>
 
         <div className="flex items-center gap-x-5">
+          <ThemeToggle />
           {await auth() ? (
             ((role === 'Support' || role === 'Admin')) ? (
               <UserNavAdmin

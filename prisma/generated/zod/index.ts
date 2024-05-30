@@ -12,7 +12,7 @@ import type { Prisma } from '@prisma/client';
 
 export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCommitted','RepeatableRead','Serializable']);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','given_name','family_name','email','password','stripeCustomerId','userRole','accountStatus','createdAt','updatedAt']);
+export const UserScalarFieldEnumSchema = z.enum(['id','given_name','family_name','email','password','stripeCustomerId','userRole','accountStatus','createdAt','updatedAt','colorScheme']);
 
 export const SubscriptionScalarFieldEnumSchema = z.enum(['stripeSubscriptionId','interval','status','planId','planName','currentPeriodStart','currentPeriodEnd','createdAt','updatedAt','userId']);
 
@@ -51,6 +51,7 @@ export const UserSchema = z.object({
   stripeCustomerId: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  colorScheme: z.string(),
 })
 
 export type User = z.infer<typeof UserSchema>
@@ -112,6 +113,7 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   accountStatus: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
+  colorScheme: z.boolean().optional(),
   Subscription: z.union([z.boolean(),z.lazy(() => SubscriptionArgsSchema)]).optional(),
 }).strict()
 
@@ -168,6 +170,7 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   accountStatus: z.union([ z.lazy(() => EnumAccountStatusFilterSchema),z.lazy(() => AccountStatusSchema) ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  colorScheme: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   Subscription: z.union([ z.lazy(() => SubscriptionNullableRelationFilterSchema),z.lazy(() => SubscriptionWhereInputSchema) ]).optional().nullable(),
 }).strict() as z.ZodType<Prisma.UserWhereInput>;
 
@@ -182,6 +185,7 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   accountStatus: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  colorScheme: z.lazy(() => SortOrderSchema).optional(),
   Subscription: z.lazy(() => SubscriptionOrderByWithRelationInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserOrderByWithRelationInput>;
 
@@ -227,6 +231,7 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   accountStatus: z.union([ z.lazy(() => EnumAccountStatusFilterSchema),z.lazy(() => AccountStatusSchema) ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  colorScheme: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   Subscription: z.union([ z.lazy(() => SubscriptionNullableRelationFilterSchema),z.lazy(() => SubscriptionWhereInputSchema) ]).optional().nullable(),
 }).strict()) as z.ZodType<Prisma.UserWhereUniqueInput>;
 
@@ -241,6 +246,7 @@ export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderBy
   accountStatus: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  colorScheme: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => UserCountOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => UserMaxOrderByAggregateInputSchema).optional(),
   _min: z.lazy(() => UserMinOrderByAggregateInputSchema).optional()
@@ -260,6 +266,7 @@ export const UserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.UserScal
   accountStatus: z.union([ z.lazy(() => EnumAccountStatusWithAggregatesFilterSchema),z.lazy(() => AccountStatusSchema) ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  colorScheme: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
 }).strict() as z.ZodType<Prisma.UserScalarWhereWithAggregatesInput>;
 
 export const SubscriptionWhereInputSchema: z.ZodType<Prisma.SubscriptionWhereInput> = z.object({
@@ -409,6 +416,7 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
   accountStatus: z.lazy(() => AccountStatusSchema).optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
+  colorScheme: z.string().optional(),
   Subscription: z.lazy(() => SubscriptionCreateNestedOneWithoutUserInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserCreateInput>;
 
@@ -423,6 +431,7 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   accountStatus: z.lazy(() => AccountStatusSchema).optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
+  colorScheme: z.string().optional(),
   Subscription: z.lazy(() => SubscriptionUncheckedCreateNestedOneWithoutUserInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedCreateInput>;
 
@@ -437,6 +446,7 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
   accountStatus: z.union([ z.lazy(() => AccountStatusSchema),z.lazy(() => EnumAccountStatusFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  colorScheme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   Subscription: z.lazy(() => SubscriptionUpdateOneWithoutUserNestedInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUpdateInput>;
 
@@ -451,6 +461,7 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   accountStatus: z.union([ z.lazy(() => AccountStatusSchema),z.lazy(() => EnumAccountStatusFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  colorScheme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   Subscription: z.lazy(() => SubscriptionUncheckedUpdateOneWithoutUserNestedInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedUpdateInput>;
 
@@ -464,7 +475,8 @@ export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = 
   userRole: z.lazy(() => UserRoleSchema).optional(),
   accountStatus: z.lazy(() => AccountStatusSchema).optional(),
   createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional()
+  updatedAt: z.coerce.date().optional(),
+  colorScheme: z.string().optional()
 }).strict() as z.ZodType<Prisma.UserCreateManyInput>;
 
 export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyMutationInput> = z.object({
@@ -478,6 +490,7 @@ export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyM
   accountStatus: z.union([ z.lazy(() => AccountStatusSchema),z.lazy(() => EnumAccountStatusFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  colorScheme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict() as z.ZodType<Prisma.UserUpdateManyMutationInput>;
 
 export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedUpdateManyInput> = z.object({
@@ -491,6 +504,7 @@ export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedU
   accountStatus: z.union([ z.lazy(() => AccountStatusSchema),z.lazy(() => EnumAccountStatusFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  colorScheme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict() as z.ZodType<Prisma.UserUncheckedUpdateManyInput>;
 
 export const SubscriptionCreateInputSchema: z.ZodType<Prisma.SubscriptionCreateInput> = z.object({
@@ -693,7 +707,8 @@ export const UserCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserCountOrd
   userRole: z.lazy(() => SortOrderSchema).optional(),
   accountStatus: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
-  updatedAt: z.lazy(() => SortOrderSchema).optional()
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  colorScheme: z.lazy(() => SortOrderSchema).optional()
 }).strict() as z.ZodType<Prisma.UserCountOrderByAggregateInput>;
 
 export const UserMaxOrderByAggregateInputSchema: z.ZodType<Prisma.UserMaxOrderByAggregateInput> = z.object({
@@ -706,7 +721,8 @@ export const UserMaxOrderByAggregateInputSchema: z.ZodType<Prisma.UserMaxOrderBy
   userRole: z.lazy(() => SortOrderSchema).optional(),
   accountStatus: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
-  updatedAt: z.lazy(() => SortOrderSchema).optional()
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  colorScheme: z.lazy(() => SortOrderSchema).optional()
 }).strict() as z.ZodType<Prisma.UserMaxOrderByAggregateInput>;
 
 export const UserMinOrderByAggregateInputSchema: z.ZodType<Prisma.UserMinOrderByAggregateInput> = z.object({
@@ -719,7 +735,8 @@ export const UserMinOrderByAggregateInputSchema: z.ZodType<Prisma.UserMinOrderBy
   userRole: z.lazy(() => SortOrderSchema).optional(),
   accountStatus: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
-  updatedAt: z.lazy(() => SortOrderSchema).optional()
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  colorScheme: z.lazy(() => SortOrderSchema).optional()
 }).strict() as z.ZodType<Prisma.UserMinOrderByAggregateInput>;
 
 export const StringWithAggregatesFilterSchema: z.ZodType<Prisma.StringWithAggregatesFilter> = z.object({
@@ -1214,7 +1231,8 @@ export const UserCreateWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserCrea
   userRole: z.lazy(() => UserRoleSchema).optional(),
   accountStatus: z.lazy(() => AccountStatusSchema).optional(),
   createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional()
+  updatedAt: z.coerce.date().optional(),
+  colorScheme: z.string().optional()
 }).strict() as z.ZodType<Prisma.UserCreateWithoutSubscriptionInput>;
 
 export const UserUncheckedCreateWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutSubscriptionInput> = z.object({
@@ -1227,7 +1245,8 @@ export const UserUncheckedCreateWithoutSubscriptionInputSchema: z.ZodType<Prisma
   userRole: z.lazy(() => UserRoleSchema).optional(),
   accountStatus: z.lazy(() => AccountStatusSchema).optional(),
   createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional()
+  updatedAt: z.coerce.date().optional(),
+  colorScheme: z.string().optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedCreateWithoutSubscriptionInput>;
 
 export const UserCreateOrConnectWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutSubscriptionInput> = z.object({
@@ -1257,6 +1276,7 @@ export const UserUpdateWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserUpda
   accountStatus: z.union([ z.lazy(() => AccountStatusSchema),z.lazy(() => EnumAccountStatusFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  colorScheme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict() as z.ZodType<Prisma.UserUpdateWithoutSubscriptionInput>;
 
 export const UserUncheckedUpdateWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutSubscriptionInput> = z.object({
@@ -1270,6 +1290,7 @@ export const UserUncheckedUpdateWithoutSubscriptionInputSchema: z.ZodType<Prisma
   accountStatus: z.union([ z.lazy(() => AccountStatusSchema),z.lazy(() => EnumAccountStatusFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  colorScheme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict() as z.ZodType<Prisma.UserUncheckedUpdateWithoutSubscriptionInput>;
 
 /////////////////////////////////////////
