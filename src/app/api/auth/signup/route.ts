@@ -4,15 +4,42 @@ import { headers } from 'next/headers';
 import { RegisterSchema } from '../authValidationSchema';
 import { sendEmail } from '@/app/components/emails/sendEmail';
 import { createUser } from '../data';
+import { digitalMarketPlaceStripe } from '@/app/lib/stripe';
 
 export async function POST(request: Request) {
   try {
     const { given_name, family_name, email, password } = await request.json();
+
+    // const account = await digitalMarketPlaceStripe.accounts.create({
+    //   email: email as string,
+    //   controller: {
+    //     losses: {
+    //       payments: "application",
+    //     },
+    //     fees: {
+    //       payer: "application",
+    //     },
+    //     stripe_dashboard: {
+    //       type: "express",
+    //     },
+    //   },
+    // });
+
+    const account = await digitalMarketPlaceStripe.accounts.create({
+      type: 'express',
+      email: email as string,
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true },
+      },
+    });
+
     const SignupDetails = {
       email: email,
       password: password,
       given_name: given_name,
       family_name: family_name,
+      connectedAccountId: account.id,
     };
     //server-side validations
     const result = RegisterSchema.safeParse(SignupDetails);
@@ -25,7 +52,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Something went wrong' }, {status: 400});
     }
 
-    const signupQuery = await createUser(given_name, family_name, email, password);
+    const signupQuery = await createUser(given_name, family_name, email, password,  account.id);
     const id = signupQuery.id
     
     const headersList = headers();

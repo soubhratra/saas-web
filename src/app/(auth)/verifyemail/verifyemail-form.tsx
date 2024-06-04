@@ -9,7 +9,7 @@ export default function VerifyEmailForm() {
 
   return (
     <form className='space-y-3 items-center justify-center'>
-      <Card className='flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8'>
+      <Card className='flex-1 rounded-lg px-6 pb-4 pt-8'>
         <CardHeader>
           <CardTitle className='lg:pl-24 items-center justify-center'>Verify your email</CardTitle>
         </CardHeader>

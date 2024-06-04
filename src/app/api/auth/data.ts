@@ -50,7 +50,8 @@ export async function getVerifiedUserByEmail(email: string): Promise<User | null
   }
 }
 
-export async function createUser(given_name: string, family_name:string, email: string, password: string) : Promise<User> {
+export async function createUser(given_name: string, family_name:string, email: string, password: string, accountId: string) : Promise<User> {
+
   // Hash the password
   const hashedPassword = await hash(password, 10)
   const user = await prisma.user.create({
@@ -59,6 +60,7 @@ export async function createUser(given_name: string, family_name:string, email: 
       family_name: family_name,
       email: email,
       password: hashedPassword,
+      connectedAccountId: accountId,
     },
   });
   

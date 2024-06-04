@@ -15,7 +15,7 @@ interface MessageComponentProps {
 
 const EmailVerificationMessageComponent: React.FC<MessageComponentProps> = ({ title, message, buttonText, buttonLink }) => (
   <form className='space-y-3 items-center justify-center'>
-    <Card className='flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8'>
+    <Card className='flex-1 rounded-lg px-6 pb-4 pt-8'>
       <CardHeader>
         <CardTitle className='lg:pl-[90px] items-center justify-center'>{title}</CardTitle>
       </CardHeader>
