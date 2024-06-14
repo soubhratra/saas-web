@@ -10,9 +10,9 @@ export default function Home() {
   const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
 
   return (
-    <main className="flex h-[calc(100dvh)] flex-col items-center justify-center p-4 md:px-24 py-32 gap-4">
+    <main className="flex h-[calc(80dvh)] flex-col items-center justify-center p-4 md:px-2 pt-2 gap-4">
       <div className="flex justify-between max-w-5xl w-full items-center">
-        <Link href="#" className="text-4xl font-bold text-gradient">shadcn-chat</Link>
+        <Link href="#" className="text-4xl font-bold text-gradient">Chat</Link>
         <Link
           href="https://github.com/jakobhoeg/shadcn-chat"
           className={cn(
@@ -29,8 +29,8 @@ export default function Home() {
       </div>
 
       <div className="flex justify-between max-w-5xl w-full items-start text-xs md:text-sm text-muted-foreground ">
-      <p className="max-w-[150px] sm:max-w-lg">Built by <a className="font-semibold" href="https://github.com/jakobhoeg/">Jakob Hoeg</a>. To be used with <a className="font-semibold" href="https://ui.shadcn.com/">shadcn</a>.</p>
-      <p className="max-w-[150px] sm:max-w-lg text-right">Source code available on <a className="font-semibold" href="https://github.com/jakobhoeg/shadcn-chat">GitHub</a>.</p>
+      <p className="max-w-[150px] sm:max-w-lg"></p>
+      <p className="max-w-[150px] sm:max-w-lg text-right"></p>
       </div>
     </main>
   );

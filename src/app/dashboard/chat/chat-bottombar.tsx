@@ -176,7 +176,7 @@ import {
               onChange={handleInputChange}
               name="message"
               placeholder="Aa"
-              className=" w-full border rounded-full flex items-center h-9 resize-none overflow-hidden bg-background"
+              className=" w-full border rounded-sm flex items-center h-9 resize-none overflow-hidden bg-background"
             ></Textarea>
             <div className="absolute right-2 bottom-0.5  ">
               <EmojiPicker onChange={(value) => {
