@@ -8,6 +8,9 @@ import { unstable_noStore as noStore } from "next/cache";
 import prisma from "@/app/lib/db";
 import { auth } from "@/auth";
 import { getUserByEmail } from "@/app/api/auth/data";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "./api/uploadthing/core";
 
 // const inter = Inter({ subsets: ["latin"] });
 const roboto = Roboto({
@@ -19,21 +22,6 @@ export const metadata: Metadata = {
   title: "Veye",
   description: "Veye - Revolutionizing Healthcare through nutrition",
 };
-
-async function getData(userId: string) {
-  noStore();
-  if (userId) {
-    const data = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        colorScheme: true,
-      },
-    });
-    return data;
-  }
-}
 
 export default async function RootLayout({
   children,
@@ -47,10 +35,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        // className={`${roboto.className} ${"theme-green"}`}
+        // className={`${roboto.className} ${"theme-violet"}`}
         className={`${roboto.className} ${user?.colorScheme ?? "theme-default"}`}
       >
         <Chatbot/>
+        <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

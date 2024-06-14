@@ -59,7 +59,6 @@ async function updateData(id: string) {
     const data = await stripe.customers.create({
       email: user?.email,
     });
-    console.log("data", data);
     
     await prisma.user.update({
       where: {

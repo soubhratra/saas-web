@@ -5,6 +5,11 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   typescript: true,
 });
 
+export const digitalMarketPlaceStripe = new Stripe(process.env.STRIPE_SECRET_KEY_DIGITAL_MARKETPLACE as string, {
+  apiVersion: "2023-10-16",
+  typescript: true,
+});
+
 export const getStripeSessionStarter = async ({
   priceId,
   domainUrl,
