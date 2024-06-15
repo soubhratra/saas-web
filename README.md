@@ -81,6 +81,3 @@ localhost
 
 To deploy this project you need to make repo in github and push the code into that after that connect your vercel account with github import the repo put all the env and tap on deploy good to go..
 
-
-
-  

@@ -19,8 +19,8 @@ const roboto = Roboto({
 })
 
 export const metadata: Metadata = {
-  title: "Veye",
-  description: "Veye - Revolutionizing Healthcare through nutrition",
+  title: "SaaS-Web",
+  description: "",
 };
 
 export default async function RootLayout({

@@ -17,6 +17,8 @@ export const navItems = [
   { name: "Home", href: "/dashboard", icon: Home },
   { name: "Blog", href: "/dashboard/blog", icon: NotebookIcon },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
+  { name: "Sell", href: "/dashboard/sell", icon: CreditCard },
+  { name: "Chat", href: "/dashboard/chat", icon: CreditCard },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
@@ -25,6 +27,8 @@ export const navItemsAdmin = [
   { name: "Admin", href: "/dashboard/admin/users", icon: Monitor },
   { name: "Blog", href: "/dashboard/blog", icon: NotebookIcon },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
+  { name: "Sell", href: "/dashboard/sell", icon: CreditCard },
+  { name: "Chat", href: "/dashboard/chat", icon: CreditCard },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
