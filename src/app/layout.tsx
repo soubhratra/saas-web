@@ -4,8 +4,6 @@ import "./globals.css";
 import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from 'sonner';
 import Chatbot from "./components/chatbot";
-import { unstable_noStore as noStore } from "next/cache";
-import prisma from "@/app/lib/db";
 import { auth } from "@/auth";
 import { getUserByEmail } from "@/app/api/auth/data";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
@@ -35,7 +33,6 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        // className={`${roboto.className} ${"theme-violet"}`}
         className={`${roboto.className} ${user?.colorScheme ?? "theme-default"}`}
       >
         <Chatbot/>

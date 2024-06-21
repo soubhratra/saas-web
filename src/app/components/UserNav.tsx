@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CreditCard, Home, Settings, Monitor, NotebookIcon , Bell} from "lucide-react";
+import { CreditCard, Home, Settings, Monitor, NotebookIcon, CodeIcon, Bell, MessageCircleIcon, CalendarClock} from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "./LogoutButton";
 
@@ -17,9 +17,9 @@ export const navItems = [
   { name: "Home", href: "/dashboard", icon: Home },
   { name: "Blog", href: "/dashboard/blog", icon: NotebookIcon },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
-  { name: "Sell", href: "/dashboard/sell", icon: CreditCard },
-  { name: "Chat", href: "/dashboard/chat", icon: CreditCard },
-  { name: "Notification", href: "/dashboard/notification", icon: Bell },
+  { name: "Sell", href: "/dashboard/sell", icon: CodeIcon },
+  { name: "Booking", href: "/dashboard/appointment", icon: CalendarClock },
+  { name: "Chat", href: "/dashboard/chat", icon: MessageCircleIcon },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
@@ -28,8 +28,9 @@ export const navItemsAdmin = [
   { name: "Admin", href: "/dashboard/admin/users", icon: Monitor },
   { name: "Blog", href: "/dashboard/blog", icon: NotebookIcon },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
-  { name: "Sell", href: "/dashboard/sell", icon: CreditCard },
-  { name: "Chat", href: "/dashboard/chat", icon: CreditCard },
+  { name: "Sell", href: "/dashboard/sell", icon: CodeIcon },
+  { name: "Booking", href: "/dashboard/appointment/availableUsers", icon: CalendarClock },
+  { name: "Chat", href: "/dashboard/chat", icon: MessageCircleIcon },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
@@ -48,7 +49,7 @@ export function UserNav({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="relative h-10 w-10 rounded-full">
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10 rounded-full">
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
