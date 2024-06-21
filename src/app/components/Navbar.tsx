@@ -3,7 +3,9 @@ import { ThemeToggle } from "./Themetoggle";
 import { Button } from "@/components/ui/button";
 import { UserNav, UserNavAdmin } from "./UserNav";
 import { auth } from "@/auth";
+import { Bell } from "lucide-react";
 import { getUserByEmail } from "../api/auth/data";
+import { fetchNotifications } from "../dashboard/notification/page";
 
 const handleStartClick = () => {
   if (typeof window !== "undefined") {
@@ -18,6 +20,8 @@ export async function Navbar() {
   const email: string = session?.user?.email!;
   const user = await getUserByEmail(email);
   const role = user?.userRole;
+  const notifications = await fetchNotifications(user?.id);
+  const hasUnreadNotifications = notifications.some((notification: any) => !notification.isRead);
   handleStartClick();
 
   return (
@@ -27,8 +31,14 @@ export async function Navbar() {
           <div className="flex justify-center flex-grow mt-2 mb-3">
           </div>
         </Link>
-
+       
         <div className="flex items-center gap-x-5">
+        <Link href="/dashboard/notification" className="relative">
+            <Bell />
+            {hasUnreadNotifications && (
+              <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            )}
+          </Link>
           <ThemeToggle />
           {await auth() ? (
             ((role === 'Support' || role === 'Admin')) ? (
@@ -55,7 +65,7 @@ export async function Navbar() {
             </div>
           )}
         </div>
-
+      
       </div>
     </nav>
   );

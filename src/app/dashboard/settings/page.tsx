@@ -20,6 +20,7 @@ import prisma from "@/app/lib/db";
 import { SubmitButton } from "@/app/components/Submitbuttons";
 import { revalidatePath, unstable_noStore as noStore } from "next/cache";
 import { auth } from "@/auth";
+import { Notification } from "@prisma/client"; 
 import { getUserByEmail } from "@/app/api/auth/data";
 
 export default async function SettingPage() {
@@ -47,8 +48,21 @@ export default async function SettingPage() {
       },
     });
 
+    if (user && user.id) {
+      const notificationInput: Pick<Notification, 'message' | 'userId'> = {
+        message: "You have updated your profile information.",
+        userId: user.id,
+      };
+      await prisma.notification.create({
+        data: notificationInput,
+      });
+    }
+
+    
     revalidatePath("/", "layout");
   }
+
+
 
   return (
     <div className="grid items-start gap-8 mb-4 md:mb-6 lg:mb-8">
@@ -98,7 +112,6 @@ export default async function SettingPage() {
                   defaultValue={user?.email as string}
                 />
               </div>
-
               <div className="space-y-1">
                 <Label>Color Scheme</Label>
                 <Select name="color" defaultValue={user?.colorScheme}>
