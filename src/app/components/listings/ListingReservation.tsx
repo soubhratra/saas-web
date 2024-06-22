@@ -28,8 +28,7 @@ import 'react-clock/dist/Clock.css';
 
 import { cn } from '../datepicker/libs/utils';
 import Button from '../Button';
-import { Reservation } from '@prisma/client';
-import { SafeReservation } from '@/app/types';
+import { SafeReservation } from '@/app/dashboard/appointment/types';
 
 interface TimeOption {
   value: string;

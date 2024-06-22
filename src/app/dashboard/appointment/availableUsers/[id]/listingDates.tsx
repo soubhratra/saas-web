@@ -1,14 +1,13 @@
 'use client';
 
 import { Range } from 'react-date-range';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { categories } from '@/app/components/navbar/Categories';
-import { SafeListing, SafeUser, SafeReservation } from '@/app/types';
+import { SafeListing, SafeUser, SafeReservation } from '@/app/dashboard/appointment/types';
 import ListingHead from '@/app/components/listings/ListingHead';
 import ListingInfo from '@/app/components/listings/ListingInfo';
-import useLoginModal from '@/app/hooks/useLoginModal';
+import useLoginModal from '@/app/dashboard/appointment/hooks/useLoginModal';
 import { useRouter } from 'next/navigation';
-import { eachDayOfInterval } from 'date-fns';
 import axios from 'axios';
 import { toast } from "sonner";
 import ListingReservation from '@/app/components/listings/ListingReservation';
