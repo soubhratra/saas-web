@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Dropdown from './Dropdown';
 import qs from 'query-string';
-
 import { AiOutlineDown } from 'react-icons/ai';
 import { useRouter, useSearchParams } from 'next/navigation';
 

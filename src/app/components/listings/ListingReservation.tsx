@@ -20,12 +20,10 @@ import {
   startOfToday,
   startOfWeek,
 } from 'date-fns';
-
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import 'react-time-picker/dist/TimePicker.css';
-import 'react-clock/dist/Clock.css';
-
+// import 'react-time-picker/dist/TimePicker.css';
+// import 'react-clock/dist/Clock.css';
 import { cn } from '../datepicker/libs/utils';
 import Button from '../Button';
 import { SafeReservation } from '@/app/dashboard/appointment/types';

@@ -1,3 +1,5 @@
+//copied
+
 import { create } from 'zustand';
 
 interface SearchModalStore {
