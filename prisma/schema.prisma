@@ -84,22 +84,22 @@ model Listing {
   price                  Int
   featureOne             String?
   featureTwo             String?
-  user                   User                 @relation(fields: [userId], references: [id])
-  reservations           Reservation[]
+  user         User           @relation(fields: [userId], references: [id])
+  reservations Reservation[]
 }
 
 model Reservation {
-  id                     String               @id @default(uuid())
-  userId                 String               @unique 
-  listingId              String
-  startDate              DateTime
-  endDate                DateTime?
-  totalPrice             Int
-  createdAt              DateTime             @default(now())
-  startTime              DateTime
-  endTime                DateTime?
-  user                   User                 @relation(fields: [userId], references: [id])
-  listing                Listing              @relation(fields: [listingId], references: [id])
+  id         String   @id @default(uuid())
+  userId     String
+  listingId  String
+  startDate  DateTime
+  endDate    DateTime
+  startTime  String
+  endTime    String
+  totalPrice Int
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  listing    Listing  @relation(fields: [listingId], references: [id])
 }
 
 

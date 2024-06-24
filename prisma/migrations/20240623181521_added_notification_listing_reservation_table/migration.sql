@@ -35,20 +35,17 @@ CREATE TABLE "Reservation" (
     "userId" TEXT NOT NULL,
     "listingId" TEXT NOT NULL,
     "startDate" TIMESTAMP(3) NOT NULL,
-    "endDate" TIMESTAMP(3),
+    "endDate" TIMESTAMP(3) NOT NULL,
+    "startTime" TEXT NOT NULL,
+    "endTime" TEXT NOT NULL,
     "totalPrice" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "startTime" TIMESTAMP(3) NOT NULL,
-    "endTime" TIMESTAMP(3),
 
     CONSTRAINT "Reservation_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Listing_userId_key" ON "Listing"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Reservation_userId_key" ON "Reservation"("userId");
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
