@@ -58,6 +58,8 @@ export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCo
 
 export const UserScalarFieldEnumSchema = z.enum(['id','given_name','family_name','email','password','stripeCustomerId','userRole','accountStatus','createdAt','updatedAt','colorScheme','connectedAccountId','stripeConnectedLinked']);
 
+export const ReservationScalarFieldEnumSchema = z.enum(['id','startDate','endDate','timeSlot','createdAt','updatedAt','userId','bookedById']);
+
 export const NotificationScalarFieldEnumSchema = z.enum(['id','message','createdAt','userId','isRead']);
 
 export const SubscriptionScalarFieldEnumSchema = z.enum(['stripeSubscriptionId','interval','status','planId','planName','currentPeriodStart','currentPeriodEnd','createdAt','updatedAt','userId']);
@@ -113,6 +115,23 @@ export const UserSchema = z.object({
 })
 
 export type User = z.infer<typeof UserSchema>
+
+/////////////////////////////////////////
+// RESERVATION SCHEMA
+/////////////////////////////////////////
+
+export const ReservationSchema = z.object({
+  id: z.string().uuid(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  timeSlot: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  userId: z.string(),
+  bookedById: z.string(),
+})
+
+export type Reservation = z.infer<typeof ReservationSchema>
 
 /////////////////////////////////////////
 // NOTIFICATION SCHEMA
@@ -188,6 +207,8 @@ export const UserIncludeSchema: z.ZodType<Prisma.UserInclude> = z.object({
   Subscription: z.union([z.boolean(),z.lazy(() => SubscriptionArgsSchema)]).optional(),
   Product: z.union([z.boolean(),z.lazy(() => ProductFindManyArgsSchema)]).optional(),
   notifications: z.union([z.boolean(),z.lazy(() => NotificationFindManyArgsSchema)]).optional(),
+  reservations: z.union([z.boolean(),z.lazy(() => ReservationFindManyArgsSchema)]).optional(),
+  bookings: z.union([z.boolean(),z.lazy(() => ReservationFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -203,6 +224,8 @@ export const UserCountOutputTypeArgsSchema: z.ZodType<Prisma.UserCountOutputType
 export const UserCountOutputTypeSelectSchema: z.ZodType<Prisma.UserCountOutputTypeSelect> = z.object({
   Product: z.boolean().optional(),
   notifications: z.boolean().optional(),
+  reservations: z.boolean().optional(),
+  bookings: z.boolean().optional(),
 }).strict();
 
 export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
@@ -222,7 +245,35 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   Subscription: z.union([z.boolean(),z.lazy(() => SubscriptionArgsSchema)]).optional(),
   Product: z.union([z.boolean(),z.lazy(() => ProductFindManyArgsSchema)]).optional(),
   notifications: z.union([z.boolean(),z.lazy(() => NotificationFindManyArgsSchema)]).optional(),
+  reservations: z.union([z.boolean(),z.lazy(() => ReservationFindManyArgsSchema)]).optional(),
+  bookings: z.union([z.boolean(),z.lazy(() => ReservationFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => UserCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+// RESERVATION
+//------------------------------------------------------
+
+export const ReservationIncludeSchema: z.ZodType<Prisma.ReservationInclude> = z.object({
+  user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
+  bookedByUser: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
+}).strict()
+
+export const ReservationArgsSchema: z.ZodType<Prisma.ReservationDefaultArgs> = z.object({
+  select: z.lazy(() => ReservationSelectSchema).optional(),
+  include: z.lazy(() => ReservationIncludeSchema).optional(),
+}).strict();
+
+export const ReservationSelectSchema: z.ZodType<Prisma.ReservationSelect> = z.object({
+  id: z.boolean().optional(),
+  startDate: z.boolean().optional(),
+  endDate: z.boolean().optional(),
+  timeSlot: z.boolean().optional(),
+  createdAt: z.boolean().optional(),
+  updatedAt: z.boolean().optional(),
+  userId: z.boolean().optional(),
+  bookedById: z.boolean().optional(),
+  user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
+  bookedByUser: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
 }).strict()
 
 // NOTIFICATION
@@ -330,7 +381,9 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   stripeConnectedLinked: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   Subscription: z.union([ z.lazy(() => SubscriptionNullableRelationFilterSchema),z.lazy(() => SubscriptionWhereInputSchema) ]).optional().nullable(),
   Product: z.lazy(() => ProductListRelationFilterSchema).optional(),
-  notifications: z.lazy(() => NotificationListRelationFilterSchema).optional()
+  notifications: z.lazy(() => NotificationListRelationFilterSchema).optional(),
+  reservations: z.lazy(() => ReservationListRelationFilterSchema).optional(),
+  bookings: z.lazy(() => ReservationListRelationFilterSchema).optional()
 }).strict() as z.ZodType<Prisma.UserWhereInput>;
 
 export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWithRelationInput> = z.object({
@@ -349,7 +402,9 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   stripeConnectedLinked: z.lazy(() => SortOrderSchema).optional(),
   Subscription: z.lazy(() => SubscriptionOrderByWithRelationInputSchema).optional(),
   Product: z.lazy(() => ProductOrderByRelationAggregateInputSchema).optional(),
-  notifications: z.lazy(() => NotificationOrderByRelationAggregateInputSchema).optional()
+  notifications: z.lazy(() => NotificationOrderByRelationAggregateInputSchema).optional(),
+  reservations: z.lazy(() => ReservationOrderByRelationAggregateInputSchema).optional(),
+  bookings: z.lazy(() => ReservationOrderByRelationAggregateInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserOrderByWithRelationInput>;
 
 export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> = z.union([
@@ -435,7 +490,9 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   stripeConnectedLinked: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   Subscription: z.union([ z.lazy(() => SubscriptionNullableRelationFilterSchema),z.lazy(() => SubscriptionWhereInputSchema) ]).optional().nullable(),
   Product: z.lazy(() => ProductListRelationFilterSchema).optional(),
-  notifications: z.lazy(() => NotificationListRelationFilterSchema).optional()
+  notifications: z.lazy(() => NotificationListRelationFilterSchema).optional(),
+  reservations: z.lazy(() => ReservationListRelationFilterSchema).optional(),
+  bookings: z.lazy(() => ReservationListRelationFilterSchema).optional()
 }).strict()) as z.ZodType<Prisma.UserWhereUniqueInput>;
 
 export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderByWithAggregationInput> = z.object({
@@ -475,6 +532,82 @@ export const UserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.UserScal
   connectedAccountId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   stripeConnectedLinked: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
 }).strict() as z.ZodType<Prisma.UserScalarWhereWithAggregatesInput>;
+
+export const ReservationWhereInputSchema: z.ZodType<Prisma.ReservationWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => ReservationWhereInputSchema),z.lazy(() => ReservationWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ReservationWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ReservationWhereInputSchema),z.lazy(() => ReservationWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  startDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  endDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  timeSlot: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  bookedById: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
+  bookedByUser: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationWhereInput>;
+
+export const ReservationOrderByWithRelationInputSchema: z.ZodType<Prisma.ReservationOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  startDate: z.lazy(() => SortOrderSchema).optional(),
+  endDate: z.lazy(() => SortOrderSchema).optional(),
+  timeSlot: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional(),
+  bookedById: z.lazy(() => SortOrderSchema).optional(),
+  user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  bookedByUser: z.lazy(() => UserOrderByWithRelationInputSchema).optional()
+}).strict() as z.ZodType<Prisma.ReservationOrderByWithRelationInput>;
+
+export const ReservationWhereUniqueInputSchema: z.ZodType<Prisma.ReservationWhereUniqueInput> = z.object({
+  id: z.string().uuid()
+})
+.and(z.object({
+  id: z.string().uuid().optional(),
+  AND: z.union([ z.lazy(() => ReservationWhereInputSchema),z.lazy(() => ReservationWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ReservationWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ReservationWhereInputSchema),z.lazy(() => ReservationWhereInputSchema).array() ]).optional(),
+  startDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  endDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  timeSlot: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  bookedById: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
+  bookedByUser: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
+}).strict()) as z.ZodType<Prisma.ReservationWhereUniqueInput>;
+
+export const ReservationOrderByWithAggregationInputSchema: z.ZodType<Prisma.ReservationOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  startDate: z.lazy(() => SortOrderSchema).optional(),
+  endDate: z.lazy(() => SortOrderSchema).optional(),
+  timeSlot: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional(),
+  bookedById: z.lazy(() => SortOrderSchema).optional(),
+  _count: z.lazy(() => ReservationCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => ReservationMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => ReservationMinOrderByAggregateInputSchema).optional()
+}).strict() as z.ZodType<Prisma.ReservationOrderByWithAggregationInput>;
+
+export const ReservationScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.ReservationScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => ReservationScalarWhereWithAggregatesInputSchema),z.lazy(() => ReservationScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ReservationScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ReservationScalarWhereWithAggregatesInputSchema),z.lazy(() => ReservationScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  startDate: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  endDate: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  timeSlot: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+  userId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  bookedById: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationScalarWhereWithAggregatesInput>;
 
 export const NotificationWhereInputSchema: z.ZodType<Prisma.NotificationWhereInput> = z.object({
   AND: z.union([ z.lazy(() => NotificationWhereInputSchema),z.lazy(() => NotificationWhereInputSchema).array() ]).optional(),
@@ -771,7 +904,9 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
   stripeConnectedLinked: z.boolean().optional(),
   Subscription: z.lazy(() => SubscriptionCreateNestedOneWithoutUserInputSchema).optional(),
   Product: z.lazy(() => ProductCreateNestedManyWithoutUserInputSchema).optional(),
-  notifications: z.lazy(() => NotificationCreateNestedManyWithoutUserInputSchema).optional()
+  notifications: z.lazy(() => NotificationCreateNestedManyWithoutUserInputSchema).optional(),
+  reservations: z.lazy(() => ReservationCreateNestedManyWithoutUserInputSchema).optional(),
+  bookings: z.lazy(() => ReservationCreateNestedManyWithoutBookedByUserInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserCreateInput>;
 
 export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreateInput> = z.object({
@@ -790,7 +925,9 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   stripeConnectedLinked: z.boolean().optional(),
   Subscription: z.lazy(() => SubscriptionUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
   Product: z.lazy(() => ProductUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  notifications: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  notifications: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUncheckedCreateNestedManyWithoutBookedByUserInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedCreateInput>;
 
 export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object({
@@ -809,7 +946,9 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
   stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   Subscription: z.lazy(() => SubscriptionUpdateOneWithoutUserNestedInputSchema).optional(),
   Product: z.lazy(() => ProductUpdateManyWithoutUserNestedInputSchema).optional(),
-  notifications: z.lazy(() => NotificationUpdateManyWithoutUserNestedInputSchema).optional()
+  notifications: z.lazy(() => NotificationUpdateManyWithoutUserNestedInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUpdateManyWithoutUserNestedInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUpdateManyWithoutBookedByUserNestedInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUpdateInput>;
 
 export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdateInput> = z.object({
@@ -828,7 +967,9 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   Subscription: z.lazy(() => SubscriptionUncheckedUpdateOneWithoutUserNestedInputSchema).optional(),
   Product: z.lazy(() => ProductUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUncheckedUpdateManyWithoutBookedByUserNestedInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedUpdateInput>;
 
 export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = z.object({
@@ -878,6 +1019,81 @@ export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedU
   connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict() as z.ZodType<Prisma.UserUncheckedUpdateManyInput>;
+
+export const ReservationCreateInputSchema: z.ZodType<Prisma.ReservationCreateInput> = z.object({
+  id: z.string().uuid().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  timeSlot: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  user: z.lazy(() => UserCreateNestedOneWithoutReservationsInputSchema),
+  bookedByUser: z.lazy(() => UserCreateNestedOneWithoutBookingsInputSchema)
+}).strict() as z.ZodType<Prisma.ReservationCreateInput>;
+
+export const ReservationUncheckedCreateInputSchema: z.ZodType<Prisma.ReservationUncheckedCreateInput> = z.object({
+  id: z.string().uuid().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  timeSlot: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  userId: z.string(),
+  bookedById: z.string()
+}).strict() as z.ZodType<Prisma.ReservationUncheckedCreateInput>;
+
+export const ReservationUpdateInputSchema: z.ZodType<Prisma.ReservationUpdateInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  timeSlot: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  user: z.lazy(() => UserUpdateOneRequiredWithoutReservationsNestedInputSchema).optional(),
+  bookedByUser: z.lazy(() => UserUpdateOneRequiredWithoutBookingsNestedInputSchema).optional()
+}).strict() as z.ZodType<Prisma.ReservationUpdateInput>;
+
+export const ReservationUncheckedUpdateInputSchema: z.ZodType<Prisma.ReservationUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  timeSlot: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  bookedById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUncheckedUpdateInput>;
+
+export const ReservationCreateManyInputSchema: z.ZodType<Prisma.ReservationCreateManyInput> = z.object({
+  id: z.string().uuid().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  timeSlot: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  userId: z.string(),
+  bookedById: z.string()
+}).strict() as z.ZodType<Prisma.ReservationCreateManyInput>;
+
+export const ReservationUpdateManyMutationInputSchema: z.ZodType<Prisma.ReservationUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  timeSlot: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUpdateManyMutationInput>;
+
+export const ReservationUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ReservationUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  timeSlot: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  bookedById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUncheckedUpdateManyInput>;
 
 export const NotificationCreateInputSchema: z.ZodType<Prisma.NotificationCreateInput> = z.object({
   id: z.string().uuid().optional(),
@@ -1226,6 +1442,12 @@ export const NotificationListRelationFilterSchema: z.ZodType<Prisma.Notification
   none: z.lazy(() => NotificationWhereInputSchema).optional()
 }).strict() as z.ZodType<Prisma.NotificationListRelationFilter>;
 
+export const ReservationListRelationFilterSchema: z.ZodType<Prisma.ReservationListRelationFilter> = z.object({
+  every: z.lazy(() => ReservationWhereInputSchema).optional(),
+  some: z.lazy(() => ReservationWhereInputSchema).optional(),
+  none: z.lazy(() => ReservationWhereInputSchema).optional()
+}).strict() as z.ZodType<Prisma.ReservationListRelationFilter>;
+
 export const SortOrderInputSchema: z.ZodType<Prisma.SortOrderInput> = z.object({
   sort: z.lazy(() => SortOrderSchema),
   nulls: z.lazy(() => NullsOrderSchema).optional()
@@ -1238,6 +1460,10 @@ export const ProductOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Produc
 export const NotificationOrderByRelationAggregateInputSchema: z.ZodType<Prisma.NotificationOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict() as z.ZodType<Prisma.NotificationOrderByRelationAggregateInput>;
+
+export const ReservationOrderByRelationAggregateInputSchema: z.ZodType<Prisma.ReservationOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
+}).strict() as z.ZodType<Prisma.ReservationOrderByRelationAggregateInput>;
 
 export const UserCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
@@ -1369,6 +1595,39 @@ export const UserRelationFilterSchema: z.ZodType<Prisma.UserRelationFilter> = z.
   is: z.lazy(() => UserWhereInputSchema).optional(),
   isNot: z.lazy(() => UserWhereInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserRelationFilter>;
+
+export const ReservationCountOrderByAggregateInputSchema: z.ZodType<Prisma.ReservationCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  startDate: z.lazy(() => SortOrderSchema).optional(),
+  endDate: z.lazy(() => SortOrderSchema).optional(),
+  timeSlot: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional(),
+  bookedById: z.lazy(() => SortOrderSchema).optional()
+}).strict() as z.ZodType<Prisma.ReservationCountOrderByAggregateInput>;
+
+export const ReservationMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ReservationMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  startDate: z.lazy(() => SortOrderSchema).optional(),
+  endDate: z.lazy(() => SortOrderSchema).optional(),
+  timeSlot: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional(),
+  bookedById: z.lazy(() => SortOrderSchema).optional()
+}).strict() as z.ZodType<Prisma.ReservationMaxOrderByAggregateInput>;
+
+export const ReservationMinOrderByAggregateInputSchema: z.ZodType<Prisma.ReservationMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  startDate: z.lazy(() => SortOrderSchema).optional(),
+  endDate: z.lazy(() => SortOrderSchema).optional(),
+  timeSlot: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional(),
+  bookedById: z.lazy(() => SortOrderSchema).optional()
+}).strict() as z.ZodType<Prisma.ReservationMinOrderByAggregateInput>;
 
 export const NotificationCountOrderByAggregateInputSchema: z.ZodType<Prisma.NotificationCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
@@ -1621,6 +1880,20 @@ export const NotificationCreateNestedManyWithoutUserInputSchema: z.ZodType<Prism
   connect: z.union([ z.lazy(() => NotificationWhereUniqueInputSchema),z.lazy(() => NotificationWhereUniqueInputSchema).array() ]).optional(),
 }).strict() as z.ZodType<Prisma.NotificationCreateNestedManyWithoutUserInput>;
 
+export const ReservationCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.ReservationCreateNestedManyWithoutUserInput> = z.object({
+  create: z.union([ z.lazy(() => ReservationCreateWithoutUserInputSchema),z.lazy(() => ReservationCreateWithoutUserInputSchema).array(),z.lazy(() => ReservationUncheckedCreateWithoutUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ReservationCreateOrConnectWithoutUserInputSchema),z.lazy(() => ReservationCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ReservationCreateManyUserInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationCreateNestedManyWithoutUserInput>;
+
+export const ReservationCreateNestedManyWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationCreateNestedManyWithoutBookedByUserInput> = z.object({
+  create: z.union([ z.lazy(() => ReservationCreateWithoutBookedByUserInputSchema),z.lazy(() => ReservationCreateWithoutBookedByUserInputSchema).array(),z.lazy(() => ReservationUncheckedCreateWithoutBookedByUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutBookedByUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ReservationCreateOrConnectWithoutBookedByUserInputSchema),z.lazy(() => ReservationCreateOrConnectWithoutBookedByUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ReservationCreateManyBookedByUserInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationCreateNestedManyWithoutBookedByUserInput>;
+
 export const SubscriptionUncheckedCreateNestedOneWithoutUserInputSchema: z.ZodType<Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput> = z.object({
   create: z.union([ z.lazy(() => SubscriptionCreateWithoutUserInputSchema),z.lazy(() => SubscriptionUncheckedCreateWithoutUserInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => SubscriptionCreateOrConnectWithoutUserInputSchema).optional(),
@@ -1640,6 +1913,20 @@ export const NotificationUncheckedCreateNestedManyWithoutUserInputSchema: z.ZodT
   createMany: z.lazy(() => NotificationCreateManyUserInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => NotificationWhereUniqueInputSchema),z.lazy(() => NotificationWhereUniqueInputSchema).array() ]).optional(),
 }).strict() as z.ZodType<Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput>;
+
+export const ReservationUncheckedCreateNestedManyWithoutUserInputSchema: z.ZodType<Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput> = z.object({
+  create: z.union([ z.lazy(() => ReservationCreateWithoutUserInputSchema),z.lazy(() => ReservationCreateWithoutUserInputSchema).array(),z.lazy(() => ReservationUncheckedCreateWithoutUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ReservationCreateOrConnectWithoutUserInputSchema),z.lazy(() => ReservationCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ReservationCreateManyUserInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUncheckedCreateNestedManyWithoutUserInput>;
+
+export const ReservationUncheckedCreateNestedManyWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationUncheckedCreateNestedManyWithoutBookedByUserInput> = z.object({
+  create: z.union([ z.lazy(() => ReservationCreateWithoutBookedByUserInputSchema),z.lazy(() => ReservationCreateWithoutBookedByUserInputSchema).array(),z.lazy(() => ReservationUncheckedCreateWithoutBookedByUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutBookedByUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ReservationCreateOrConnectWithoutBookedByUserInputSchema),z.lazy(() => ReservationCreateOrConnectWithoutBookedByUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ReservationCreateManyBookedByUserInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUncheckedCreateNestedManyWithoutBookedByUserInput>;
 
 export const StringFieldUpdateOperationsInputSchema: z.ZodType<Prisma.StringFieldUpdateOperationsInput> = z.object({
   set: z.string().optional()
@@ -1703,6 +1990,34 @@ export const NotificationUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prism
   deleteMany: z.union([ z.lazy(() => NotificationScalarWhereInputSchema),z.lazy(() => NotificationScalarWhereInputSchema).array() ]).optional(),
 }).strict() as z.ZodType<Prisma.NotificationUpdateManyWithoutUserNestedInput>;
 
+export const ReservationUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.ReservationUpdateManyWithoutUserNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ReservationCreateWithoutUserInputSchema),z.lazy(() => ReservationCreateWithoutUserInputSchema).array(),z.lazy(() => ReservationUncheckedCreateWithoutUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ReservationCreateOrConnectWithoutUserInputSchema),z.lazy(() => ReservationCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ReservationUpsertWithWhereUniqueWithoutUserInputSchema),z.lazy(() => ReservationUpsertWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ReservationCreateManyUserInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ReservationUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => ReservationUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ReservationUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => ReservationUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => ReservationScalarWhereInputSchema),z.lazy(() => ReservationScalarWhereInputSchema).array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUpdateManyWithoutUserNestedInput>;
+
+export const ReservationUpdateManyWithoutBookedByUserNestedInputSchema: z.ZodType<Prisma.ReservationUpdateManyWithoutBookedByUserNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ReservationCreateWithoutBookedByUserInputSchema),z.lazy(() => ReservationCreateWithoutBookedByUserInputSchema).array(),z.lazy(() => ReservationUncheckedCreateWithoutBookedByUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutBookedByUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ReservationCreateOrConnectWithoutBookedByUserInputSchema),z.lazy(() => ReservationCreateOrConnectWithoutBookedByUserInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ReservationUpsertWithWhereUniqueWithoutBookedByUserInputSchema),z.lazy(() => ReservationUpsertWithWhereUniqueWithoutBookedByUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ReservationCreateManyBookedByUserInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ReservationUpdateWithWhereUniqueWithoutBookedByUserInputSchema),z.lazy(() => ReservationUpdateWithWhereUniqueWithoutBookedByUserInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ReservationUpdateManyWithWhereWithoutBookedByUserInputSchema),z.lazy(() => ReservationUpdateManyWithWhereWithoutBookedByUserInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => ReservationScalarWhereInputSchema),z.lazy(() => ReservationScalarWhereInputSchema).array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUpdateManyWithoutBookedByUserNestedInput>;
+
 export const SubscriptionUncheckedUpdateOneWithoutUserNestedInputSchema: z.ZodType<Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput> = z.object({
   create: z.union([ z.lazy(() => SubscriptionCreateWithoutUserInputSchema),z.lazy(() => SubscriptionUncheckedCreateWithoutUserInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => SubscriptionCreateOrConnectWithoutUserInputSchema).optional(),
@@ -1740,6 +2055,62 @@ export const NotificationUncheckedUpdateManyWithoutUserNestedInputSchema: z.ZodT
   updateMany: z.union([ z.lazy(() => NotificationUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => NotificationUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => NotificationScalarWhereInputSchema),z.lazy(() => NotificationScalarWhereInputSchema).array() ]).optional(),
 }).strict() as z.ZodType<Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput>;
+
+export const ReservationUncheckedUpdateManyWithoutUserNestedInputSchema: z.ZodType<Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ReservationCreateWithoutUserInputSchema),z.lazy(() => ReservationCreateWithoutUserInputSchema).array(),z.lazy(() => ReservationUncheckedCreateWithoutUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ReservationCreateOrConnectWithoutUserInputSchema),z.lazy(() => ReservationCreateOrConnectWithoutUserInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ReservationUpsertWithWhereUniqueWithoutUserInputSchema),z.lazy(() => ReservationUpsertWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ReservationCreateManyUserInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ReservationUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => ReservationUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ReservationUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => ReservationUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => ReservationScalarWhereInputSchema),z.lazy(() => ReservationScalarWhereInputSchema).array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUncheckedUpdateManyWithoutUserNestedInput>;
+
+export const ReservationUncheckedUpdateManyWithoutBookedByUserNestedInputSchema: z.ZodType<Prisma.ReservationUncheckedUpdateManyWithoutBookedByUserNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ReservationCreateWithoutBookedByUserInputSchema),z.lazy(() => ReservationCreateWithoutBookedByUserInputSchema).array(),z.lazy(() => ReservationUncheckedCreateWithoutBookedByUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutBookedByUserInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ReservationCreateOrConnectWithoutBookedByUserInputSchema),z.lazy(() => ReservationCreateOrConnectWithoutBookedByUserInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ReservationUpsertWithWhereUniqueWithoutBookedByUserInputSchema),z.lazy(() => ReservationUpsertWithWhereUniqueWithoutBookedByUserInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ReservationCreateManyBookedByUserInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => ReservationWhereUniqueInputSchema),z.lazy(() => ReservationWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ReservationUpdateWithWhereUniqueWithoutBookedByUserInputSchema),z.lazy(() => ReservationUpdateWithWhereUniqueWithoutBookedByUserInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ReservationUpdateManyWithWhereWithoutBookedByUserInputSchema),z.lazy(() => ReservationUpdateManyWithWhereWithoutBookedByUserInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => ReservationScalarWhereInputSchema),z.lazy(() => ReservationScalarWhereInputSchema).array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUncheckedUpdateManyWithoutBookedByUserNestedInput>;
+
+export const UserCreateNestedOneWithoutReservationsInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutReservationsInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutReservationsInputSchema),z.lazy(() => UserUncheckedCreateWithoutReservationsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutReservationsInputSchema).optional(),
+  connect: z.lazy(() => UserWhereUniqueInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserCreateNestedOneWithoutReservationsInput>;
+
+export const UserCreateNestedOneWithoutBookingsInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutBookingsInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutBookingsInputSchema),z.lazy(() => UserUncheckedCreateWithoutBookingsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutBookingsInputSchema).optional(),
+  connect: z.lazy(() => UserWhereUniqueInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserCreateNestedOneWithoutBookingsInput>;
+
+export const UserUpdateOneRequiredWithoutReservationsNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutReservationsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutReservationsInputSchema),z.lazy(() => UserUncheckedCreateWithoutReservationsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutReservationsInputSchema).optional(),
+  upsert: z.lazy(() => UserUpsertWithoutReservationsInputSchema).optional(),
+  connect: z.lazy(() => UserWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutReservationsInputSchema),z.lazy(() => UserUpdateWithoutReservationsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutReservationsInputSchema) ]).optional(),
+}).strict() as z.ZodType<Prisma.UserUpdateOneRequiredWithoutReservationsNestedInput>;
+
+export const UserUpdateOneRequiredWithoutBookingsNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutBookingsInputSchema),z.lazy(() => UserUncheckedCreateWithoutBookingsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutBookingsInputSchema).optional(),
+  upsert: z.lazy(() => UserUpsertWithoutBookingsInputSchema).optional(),
+  connect: z.lazy(() => UserWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutBookingsInputSchema),z.lazy(() => UserUpdateWithoutBookingsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutBookingsInputSchema) ]).optional(),
+}).strict() as z.ZodType<Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput>;
 
 export const UserCreateNestedOneWithoutNotificationsInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutNotificationsInput> = z.object({
   create: z.union([ z.lazy(() => UserCreateWithoutNotificationsInputSchema),z.lazy(() => UserUncheckedCreateWithoutNotificationsInputSchema) ]).optional(),
@@ -2109,6 +2480,66 @@ export const NotificationCreateManyUserInputEnvelopeSchema: z.ZodType<Prisma.Not
   skipDuplicates: z.boolean().optional()
 }).strict() as z.ZodType<Prisma.NotificationCreateManyUserInputEnvelope>;
 
+export const ReservationCreateWithoutUserInputSchema: z.ZodType<Prisma.ReservationCreateWithoutUserInput> = z.object({
+  id: z.string().uuid().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  timeSlot: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  bookedByUser: z.lazy(() => UserCreateNestedOneWithoutBookingsInputSchema)
+}).strict() as z.ZodType<Prisma.ReservationCreateWithoutUserInput>;
+
+export const ReservationUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.ReservationUncheckedCreateWithoutUserInput> = z.object({
+  id: z.string().uuid().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  timeSlot: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  bookedById: z.string()
+}).strict() as z.ZodType<Prisma.ReservationUncheckedCreateWithoutUserInput>;
+
+export const ReservationCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.ReservationCreateOrConnectWithoutUserInput> = z.object({
+  where: z.lazy(() => ReservationWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => ReservationCreateWithoutUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutUserInputSchema) ]),
+}).strict() as z.ZodType<Prisma.ReservationCreateOrConnectWithoutUserInput>;
+
+export const ReservationCreateManyUserInputEnvelopeSchema: z.ZodType<Prisma.ReservationCreateManyUserInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => ReservationCreateManyUserInputSchema),z.lazy(() => ReservationCreateManyUserInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict() as z.ZodType<Prisma.ReservationCreateManyUserInputEnvelope>;
+
+export const ReservationCreateWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationCreateWithoutBookedByUserInput> = z.object({
+  id: z.string().uuid().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  timeSlot: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  user: z.lazy(() => UserCreateNestedOneWithoutReservationsInputSchema)
+}).strict() as z.ZodType<Prisma.ReservationCreateWithoutBookedByUserInput>;
+
+export const ReservationUncheckedCreateWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationUncheckedCreateWithoutBookedByUserInput> = z.object({
+  id: z.string().uuid().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  timeSlot: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  userId: z.string()
+}).strict() as z.ZodType<Prisma.ReservationUncheckedCreateWithoutBookedByUserInput>;
+
+export const ReservationCreateOrConnectWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationCreateOrConnectWithoutBookedByUserInput> = z.object({
+  where: z.lazy(() => ReservationWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => ReservationCreateWithoutBookedByUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutBookedByUserInputSchema) ]),
+}).strict() as z.ZodType<Prisma.ReservationCreateOrConnectWithoutBookedByUserInput>;
+
+export const ReservationCreateManyBookedByUserInputEnvelopeSchema: z.ZodType<Prisma.ReservationCreateManyBookedByUserInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => ReservationCreateManyBookedByUserInputSchema),z.lazy(() => ReservationCreateManyBookedByUserInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict() as z.ZodType<Prisma.ReservationCreateManyBookedByUserInputEnvelope>;
+
 export const SubscriptionUpsertWithoutUserInputSchema: z.ZodType<Prisma.SubscriptionUpsertWithoutUserInput> = z.object({
   update: z.union([ z.lazy(() => SubscriptionUpdateWithoutUserInputSchema),z.lazy(() => SubscriptionUncheckedUpdateWithoutUserInputSchema) ]),
   create: z.union([ z.lazy(() => SubscriptionCreateWithoutUserInputSchema),z.lazy(() => SubscriptionUncheckedCreateWithoutUserInputSchema) ]),
@@ -2203,6 +2634,244 @@ export const NotificationScalarWhereInputSchema: z.ZodType<Prisma.NotificationSc
   isRead: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
 }).strict() as z.ZodType<Prisma.NotificationScalarWhereInput>;
 
+export const ReservationUpsertWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.ReservationUpsertWithWhereUniqueWithoutUserInput> = z.object({
+  where: z.lazy(() => ReservationWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => ReservationUpdateWithoutUserInputSchema),z.lazy(() => ReservationUncheckedUpdateWithoutUserInputSchema) ]),
+  create: z.union([ z.lazy(() => ReservationCreateWithoutUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutUserInputSchema) ]),
+}).strict() as z.ZodType<Prisma.ReservationUpsertWithWhereUniqueWithoutUserInput>;
+
+export const ReservationUpdateWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.ReservationUpdateWithWhereUniqueWithoutUserInput> = z.object({
+  where: z.lazy(() => ReservationWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => ReservationUpdateWithoutUserInputSchema),z.lazy(() => ReservationUncheckedUpdateWithoutUserInputSchema) ]),
+}).strict() as z.ZodType<Prisma.ReservationUpdateWithWhereUniqueWithoutUserInput>;
+
+export const ReservationUpdateManyWithWhereWithoutUserInputSchema: z.ZodType<Prisma.ReservationUpdateManyWithWhereWithoutUserInput> = z.object({
+  where: z.lazy(() => ReservationScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => ReservationUpdateManyMutationInputSchema),z.lazy(() => ReservationUncheckedUpdateManyWithoutUserInputSchema) ]),
+}).strict() as z.ZodType<Prisma.ReservationUpdateManyWithWhereWithoutUserInput>;
+
+export const ReservationScalarWhereInputSchema: z.ZodType<Prisma.ReservationScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => ReservationScalarWhereInputSchema),z.lazy(() => ReservationScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => ReservationScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => ReservationScalarWhereInputSchema),z.lazy(() => ReservationScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  startDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  endDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  timeSlot: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  bookedById: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationScalarWhereInput>;
+
+export const ReservationUpsertWithWhereUniqueWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationUpsertWithWhereUniqueWithoutBookedByUserInput> = z.object({
+  where: z.lazy(() => ReservationWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => ReservationUpdateWithoutBookedByUserInputSchema),z.lazy(() => ReservationUncheckedUpdateWithoutBookedByUserInputSchema) ]),
+  create: z.union([ z.lazy(() => ReservationCreateWithoutBookedByUserInputSchema),z.lazy(() => ReservationUncheckedCreateWithoutBookedByUserInputSchema) ]),
+}).strict() as z.ZodType<Prisma.ReservationUpsertWithWhereUniqueWithoutBookedByUserInput>;
+
+export const ReservationUpdateWithWhereUniqueWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationUpdateWithWhereUniqueWithoutBookedByUserInput> = z.object({
+  where: z.lazy(() => ReservationWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => ReservationUpdateWithoutBookedByUserInputSchema),z.lazy(() => ReservationUncheckedUpdateWithoutBookedByUserInputSchema) ]),
+}).strict() as z.ZodType<Prisma.ReservationUpdateWithWhereUniqueWithoutBookedByUserInput>;
+
+export const ReservationUpdateManyWithWhereWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationUpdateManyWithWhereWithoutBookedByUserInput> = z.object({
+  where: z.lazy(() => ReservationScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => ReservationUpdateManyMutationInputSchema),z.lazy(() => ReservationUncheckedUpdateManyWithoutBookedByUserInputSchema) ]),
+}).strict() as z.ZodType<Prisma.ReservationUpdateManyWithWhereWithoutBookedByUserInput>;
+
+export const UserCreateWithoutReservationsInputSchema: z.ZodType<Prisma.UserCreateWithoutReservationsInput> = z.object({
+  id: z.string().uuid().optional(),
+  given_name: z.string().min(3, { message: "First name must be at least 3 characters long." }).max(50, { message: "First name must not exceed 50 characters." }),
+  family_name: z.string().min(3, { message: "Last name must be at least 3 characters long." }).max(50, { message: "Last name must not exceed 50 characters." }),
+  email: z.string().email(),
+  password: z.string().min(6, { message: "Password must be at least 6 characters long." }).max(50, { message: "Password must not exceed 50 characters." }),
+  stripeCustomerId: z.string().optional().nullable(),
+  userRole: z.lazy(() => UserRoleSchema).optional(),
+  accountStatus: z.lazy(() => AccountStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  colorScheme: z.string().optional(),
+  connectedAccountId: z.string().optional().nullable(),
+  stripeConnectedLinked: z.boolean().optional(),
+  Subscription: z.lazy(() => SubscriptionCreateNestedOneWithoutUserInputSchema).optional(),
+  Product: z.lazy(() => ProductCreateNestedManyWithoutUserInputSchema).optional(),
+  notifications: z.lazy(() => NotificationCreateNestedManyWithoutUserInputSchema).optional(),
+  bookings: z.lazy(() => ReservationCreateNestedManyWithoutBookedByUserInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserCreateWithoutReservationsInput>;
+
+export const UserUncheckedCreateWithoutReservationsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutReservationsInput> = z.object({
+  id: z.string().uuid().optional(),
+  given_name: z.string().min(3, { message: "First name must be at least 3 characters long." }).max(50, { message: "First name must not exceed 50 characters." }),
+  family_name: z.string().min(3, { message: "Last name must be at least 3 characters long." }).max(50, { message: "Last name must not exceed 50 characters." }),
+  email: z.string().email(),
+  password: z.string().min(6, { message: "Password must be at least 6 characters long." }).max(50, { message: "Password must not exceed 50 characters." }),
+  stripeCustomerId: z.string().optional().nullable(),
+  userRole: z.lazy(() => UserRoleSchema).optional(),
+  accountStatus: z.lazy(() => AccountStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  colorScheme: z.string().optional(),
+  connectedAccountId: z.string().optional().nullable(),
+  stripeConnectedLinked: z.boolean().optional(),
+  Subscription: z.lazy(() => SubscriptionUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
+  Product: z.lazy(() => ProductUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  notifications: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUncheckedCreateNestedManyWithoutBookedByUserInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserUncheckedCreateWithoutReservationsInput>;
+
+export const UserCreateOrConnectWithoutReservationsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutReservationsInput> = z.object({
+  where: z.lazy(() => UserWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => UserCreateWithoutReservationsInputSchema),z.lazy(() => UserUncheckedCreateWithoutReservationsInputSchema) ]),
+}).strict() as z.ZodType<Prisma.UserCreateOrConnectWithoutReservationsInput>;
+
+export const UserCreateWithoutBookingsInputSchema: z.ZodType<Prisma.UserCreateWithoutBookingsInput> = z.object({
+  id: z.string().uuid().optional(),
+  given_name: z.string().min(3, { message: "First name must be at least 3 characters long." }).max(50, { message: "First name must not exceed 50 characters." }),
+  family_name: z.string().min(3, { message: "Last name must be at least 3 characters long." }).max(50, { message: "Last name must not exceed 50 characters." }),
+  email: z.string().email(),
+  password: z.string().min(6, { message: "Password must be at least 6 characters long." }).max(50, { message: "Password must not exceed 50 characters." }),
+  stripeCustomerId: z.string().optional().nullable(),
+  userRole: z.lazy(() => UserRoleSchema).optional(),
+  accountStatus: z.lazy(() => AccountStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  colorScheme: z.string().optional(),
+  connectedAccountId: z.string().optional().nullable(),
+  stripeConnectedLinked: z.boolean().optional(),
+  Subscription: z.lazy(() => SubscriptionCreateNestedOneWithoutUserInputSchema).optional(),
+  Product: z.lazy(() => ProductCreateNestedManyWithoutUserInputSchema).optional(),
+  notifications: z.lazy(() => NotificationCreateNestedManyWithoutUserInputSchema).optional(),
+  reservations: z.lazy(() => ReservationCreateNestedManyWithoutUserInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserCreateWithoutBookingsInput>;
+
+export const UserUncheckedCreateWithoutBookingsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutBookingsInput> = z.object({
+  id: z.string().uuid().optional(),
+  given_name: z.string().min(3, { message: "First name must be at least 3 characters long." }).max(50, { message: "First name must not exceed 50 characters." }),
+  family_name: z.string().min(3, { message: "Last name must be at least 3 characters long." }).max(50, { message: "Last name must not exceed 50 characters." }),
+  email: z.string().email(),
+  password: z.string().min(6, { message: "Password must be at least 6 characters long." }).max(50, { message: "Password must not exceed 50 characters." }),
+  stripeCustomerId: z.string().optional().nullable(),
+  userRole: z.lazy(() => UserRoleSchema).optional(),
+  accountStatus: z.lazy(() => AccountStatusSchema).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  colorScheme: z.string().optional(),
+  connectedAccountId: z.string().optional().nullable(),
+  stripeConnectedLinked: z.boolean().optional(),
+  Subscription: z.lazy(() => SubscriptionUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
+  Product: z.lazy(() => ProductUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  notifications: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserUncheckedCreateWithoutBookingsInput>;
+
+export const UserCreateOrConnectWithoutBookingsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutBookingsInput> = z.object({
+  where: z.lazy(() => UserWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => UserCreateWithoutBookingsInputSchema),z.lazy(() => UserUncheckedCreateWithoutBookingsInputSchema) ]),
+}).strict() as z.ZodType<Prisma.UserCreateOrConnectWithoutBookingsInput>;
+
+export const UserUpsertWithoutReservationsInputSchema: z.ZodType<Prisma.UserUpsertWithoutReservationsInput> = z.object({
+  update: z.union([ z.lazy(() => UserUpdateWithoutReservationsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutReservationsInputSchema) ]),
+  create: z.union([ z.lazy(() => UserCreateWithoutReservationsInputSchema),z.lazy(() => UserUncheckedCreateWithoutReservationsInputSchema) ]),
+  where: z.lazy(() => UserWhereInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserUpsertWithoutReservationsInput>;
+
+export const UserUpdateToOneWithWhereWithoutReservationsInputSchema: z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutReservationsInput> = z.object({
+  where: z.lazy(() => UserWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => UserUpdateWithoutReservationsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutReservationsInputSchema) ]),
+}).strict() as z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutReservationsInput>;
+
+export const UserUpdateWithoutReservationsInputSchema: z.ZodType<Prisma.UserUpdateWithoutReservationsInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  given_name: z.union([ z.string().min(3, { message: "First name must be at least 3 characters long." }).max(50, { message: "First name must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  family_name: z.union([ z.string().min(3, { message: "Last name must be at least 3 characters long." }).max(50, { message: "Last name must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string().email(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  password: z.union([ z.string().min(6, { message: "Password must be at least 6 characters long." }).max(50, { message: "Password must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  userRole: z.union([ z.lazy(() => UserRoleSchema),z.lazy(() => EnumUserRoleFieldUpdateOperationsInputSchema) ]).optional(),
+  accountStatus: z.union([ z.lazy(() => AccountStatusSchema),z.lazy(() => EnumAccountStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  colorScheme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  Subscription: z.lazy(() => SubscriptionUpdateOneWithoutUserNestedInputSchema).optional(),
+  Product: z.lazy(() => ProductUpdateManyWithoutUserNestedInputSchema).optional(),
+  notifications: z.lazy(() => NotificationUpdateManyWithoutUserNestedInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUpdateManyWithoutBookedByUserNestedInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserUpdateWithoutReservationsInput>;
+
+export const UserUncheckedUpdateWithoutReservationsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutReservationsInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  given_name: z.union([ z.string().min(3, { message: "First name must be at least 3 characters long." }).max(50, { message: "First name must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  family_name: z.union([ z.string().min(3, { message: "Last name must be at least 3 characters long." }).max(50, { message: "Last name must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string().email(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  password: z.union([ z.string().min(6, { message: "Password must be at least 6 characters long." }).max(50, { message: "Password must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  userRole: z.union([ z.lazy(() => UserRoleSchema),z.lazy(() => EnumUserRoleFieldUpdateOperationsInputSchema) ]).optional(),
+  accountStatus: z.union([ z.lazy(() => AccountStatusSchema),z.lazy(() => EnumAccountStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  colorScheme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  Subscription: z.lazy(() => SubscriptionUncheckedUpdateOneWithoutUserNestedInputSchema).optional(),
+  Product: z.lazy(() => ProductUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUncheckedUpdateManyWithoutBookedByUserNestedInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserUncheckedUpdateWithoutReservationsInput>;
+
+export const UserUpsertWithoutBookingsInputSchema: z.ZodType<Prisma.UserUpsertWithoutBookingsInput> = z.object({
+  update: z.union([ z.lazy(() => UserUpdateWithoutBookingsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutBookingsInputSchema) ]),
+  create: z.union([ z.lazy(() => UserCreateWithoutBookingsInputSchema),z.lazy(() => UserUncheckedCreateWithoutBookingsInputSchema) ]),
+  where: z.lazy(() => UserWhereInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserUpsertWithoutBookingsInput>;
+
+export const UserUpdateToOneWithWhereWithoutBookingsInputSchema: z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutBookingsInput> = z.object({
+  where: z.lazy(() => UserWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => UserUpdateWithoutBookingsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutBookingsInputSchema) ]),
+}).strict() as z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutBookingsInput>;
+
+export const UserUpdateWithoutBookingsInputSchema: z.ZodType<Prisma.UserUpdateWithoutBookingsInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  given_name: z.union([ z.string().min(3, { message: "First name must be at least 3 characters long." }).max(50, { message: "First name must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  family_name: z.union([ z.string().min(3, { message: "Last name must be at least 3 characters long." }).max(50, { message: "Last name must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string().email(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  password: z.union([ z.string().min(6, { message: "Password must be at least 6 characters long." }).max(50, { message: "Password must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  userRole: z.union([ z.lazy(() => UserRoleSchema),z.lazy(() => EnumUserRoleFieldUpdateOperationsInputSchema) ]).optional(),
+  accountStatus: z.union([ z.lazy(() => AccountStatusSchema),z.lazy(() => EnumAccountStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  colorScheme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  Subscription: z.lazy(() => SubscriptionUpdateOneWithoutUserNestedInputSchema).optional(),
+  Product: z.lazy(() => ProductUpdateManyWithoutUserNestedInputSchema).optional(),
+  notifications: z.lazy(() => NotificationUpdateManyWithoutUserNestedInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUpdateManyWithoutUserNestedInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserUpdateWithoutBookingsInput>;
+
+export const UserUncheckedUpdateWithoutBookingsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutBookingsInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  given_name: z.union([ z.string().min(3, { message: "First name must be at least 3 characters long." }).max(50, { message: "First name must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  family_name: z.union([ z.string().min(3, { message: "Last name must be at least 3 characters long." }).max(50, { message: "Last name must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string().email(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  password: z.union([ z.string().min(6, { message: "Password must be at least 6 characters long." }).max(50, { message: "Password must not exceed 50 characters." }),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  stripeCustomerId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  userRole: z.union([ z.lazy(() => UserRoleSchema),z.lazy(() => EnumUserRoleFieldUpdateOperationsInputSchema) ]).optional(),
+  accountStatus: z.union([ z.lazy(() => AccountStatusSchema),z.lazy(() => EnumAccountStatusFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  colorScheme: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  Subscription: z.lazy(() => SubscriptionUncheckedUpdateOneWithoutUserNestedInputSchema).optional(),
+  Product: z.lazy(() => ProductUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+}).strict() as z.ZodType<Prisma.UserUncheckedUpdateWithoutBookingsInput>;
+
 export const UserCreateWithoutNotificationsInputSchema: z.ZodType<Prisma.UserCreateWithoutNotificationsInput> = z.object({
   id: z.string().uuid().optional(),
   given_name: z.string().min(3, { message: "First name must be at least 3 characters long." }).max(50, { message: "First name must not exceed 50 characters." }),
@@ -2218,7 +2887,9 @@ export const UserCreateWithoutNotificationsInputSchema: z.ZodType<Prisma.UserCre
   connectedAccountId: z.string().optional().nullable(),
   stripeConnectedLinked: z.boolean().optional(),
   Subscription: z.lazy(() => SubscriptionCreateNestedOneWithoutUserInputSchema).optional(),
-  Product: z.lazy(() => ProductCreateNestedManyWithoutUserInputSchema).optional()
+  Product: z.lazy(() => ProductCreateNestedManyWithoutUserInputSchema).optional(),
+  reservations: z.lazy(() => ReservationCreateNestedManyWithoutUserInputSchema).optional(),
+  bookings: z.lazy(() => ReservationCreateNestedManyWithoutBookedByUserInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserCreateWithoutNotificationsInput>;
 
 export const UserUncheckedCreateWithoutNotificationsInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutNotificationsInput> = z.object({
@@ -2236,7 +2907,9 @@ export const UserUncheckedCreateWithoutNotificationsInputSchema: z.ZodType<Prism
   connectedAccountId: z.string().optional().nullable(),
   stripeConnectedLinked: z.boolean().optional(),
   Subscription: z.lazy(() => SubscriptionUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
-  Product: z.lazy(() => ProductUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  Product: z.lazy(() => ProductUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUncheckedCreateNestedManyWithoutBookedByUserInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedCreateWithoutNotificationsInput>;
 
 export const UserCreateOrConnectWithoutNotificationsInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutNotificationsInput> = z.object({
@@ -2270,7 +2943,9 @@ export const UserUpdateWithoutNotificationsInputSchema: z.ZodType<Prisma.UserUpd
   connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   Subscription: z.lazy(() => SubscriptionUpdateOneWithoutUserNestedInputSchema).optional(),
-  Product: z.lazy(() => ProductUpdateManyWithoutUserNestedInputSchema).optional()
+  Product: z.lazy(() => ProductUpdateManyWithoutUserNestedInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUpdateManyWithoutUserNestedInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUpdateManyWithoutBookedByUserNestedInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUpdateWithoutNotificationsInput>;
 
 export const UserUncheckedUpdateWithoutNotificationsInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutNotificationsInput> = z.object({
@@ -2288,7 +2963,9 @@ export const UserUncheckedUpdateWithoutNotificationsInputSchema: z.ZodType<Prism
   connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   Subscription: z.lazy(() => SubscriptionUncheckedUpdateOneWithoutUserNestedInputSchema).optional(),
-  Product: z.lazy(() => ProductUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  Product: z.lazy(() => ProductUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUncheckedUpdateManyWithoutBookedByUserNestedInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedUpdateWithoutNotificationsInput>;
 
 export const UserCreateWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserCreateWithoutSubscriptionInput> = z.object({
@@ -2306,7 +2983,9 @@ export const UserCreateWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserCrea
   connectedAccountId: z.string().optional().nullable(),
   stripeConnectedLinked: z.boolean().optional(),
   Product: z.lazy(() => ProductCreateNestedManyWithoutUserInputSchema).optional(),
-  notifications: z.lazy(() => NotificationCreateNestedManyWithoutUserInputSchema).optional()
+  notifications: z.lazy(() => NotificationCreateNestedManyWithoutUserInputSchema).optional(),
+  reservations: z.lazy(() => ReservationCreateNestedManyWithoutUserInputSchema).optional(),
+  bookings: z.lazy(() => ReservationCreateNestedManyWithoutBookedByUserInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserCreateWithoutSubscriptionInput>;
 
 export const UserUncheckedCreateWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutSubscriptionInput> = z.object({
@@ -2324,7 +3003,9 @@ export const UserUncheckedCreateWithoutSubscriptionInputSchema: z.ZodType<Prisma
   connectedAccountId: z.string().optional().nullable(),
   stripeConnectedLinked: z.boolean().optional(),
   Product: z.lazy(() => ProductUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
-  notifications: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  notifications: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUncheckedCreateNestedManyWithoutBookedByUserInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedCreateWithoutSubscriptionInput>;
 
 export const UserCreateOrConnectWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutSubscriptionInput> = z.object({
@@ -2358,7 +3039,9 @@ export const UserUpdateWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserUpda
   connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   Product: z.lazy(() => ProductUpdateManyWithoutUserNestedInputSchema).optional(),
-  notifications: z.lazy(() => NotificationUpdateManyWithoutUserNestedInputSchema).optional()
+  notifications: z.lazy(() => NotificationUpdateManyWithoutUserNestedInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUpdateManyWithoutUserNestedInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUpdateManyWithoutBookedByUserNestedInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUpdateWithoutSubscriptionInput>;
 
 export const UserUncheckedUpdateWithoutSubscriptionInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutSubscriptionInput> = z.object({
@@ -2376,7 +3059,9 @@ export const UserUncheckedUpdateWithoutSubscriptionInputSchema: z.ZodType<Prisma
   connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   Product: z.lazy(() => ProductUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
-  notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUncheckedUpdateManyWithoutBookedByUserNestedInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedUpdateWithoutSubscriptionInput>;
 
 export const UserCreateWithoutProductInputSchema: z.ZodType<Prisma.UserCreateWithoutProductInput> = z.object({
@@ -2394,7 +3079,9 @@ export const UserCreateWithoutProductInputSchema: z.ZodType<Prisma.UserCreateWit
   connectedAccountId: z.string().optional().nullable(),
   stripeConnectedLinked: z.boolean().optional(),
   Subscription: z.lazy(() => SubscriptionCreateNestedOneWithoutUserInputSchema).optional(),
-  notifications: z.lazy(() => NotificationCreateNestedManyWithoutUserInputSchema).optional()
+  notifications: z.lazy(() => NotificationCreateNestedManyWithoutUserInputSchema).optional(),
+  reservations: z.lazy(() => ReservationCreateNestedManyWithoutUserInputSchema).optional(),
+  bookings: z.lazy(() => ReservationCreateNestedManyWithoutBookedByUserInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserCreateWithoutProductInput>;
 
 export const UserUncheckedCreateWithoutProductInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutProductInput> = z.object({
@@ -2412,7 +3099,9 @@ export const UserUncheckedCreateWithoutProductInputSchema: z.ZodType<Prisma.User
   connectedAccountId: z.string().optional().nullable(),
   stripeConnectedLinked: z.boolean().optional(),
   Subscription: z.lazy(() => SubscriptionUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
-  notifications: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutUserInputSchema).optional()
+  notifications: z.lazy(() => NotificationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUncheckedCreateNestedManyWithoutBookedByUserInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedCreateWithoutProductInput>;
 
 export const UserCreateOrConnectWithoutProductInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutProductInput> = z.object({
@@ -2446,7 +3135,9 @@ export const UserUpdateWithoutProductInputSchema: z.ZodType<Prisma.UserUpdateWit
   connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   Subscription: z.lazy(() => SubscriptionUpdateOneWithoutUserNestedInputSchema).optional(),
-  notifications: z.lazy(() => NotificationUpdateManyWithoutUserNestedInputSchema).optional()
+  notifications: z.lazy(() => NotificationUpdateManyWithoutUserNestedInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUpdateManyWithoutUserNestedInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUpdateManyWithoutBookedByUserNestedInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUpdateWithoutProductInput>;
 
 export const UserUncheckedUpdateWithoutProductInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutProductInput> = z.object({
@@ -2464,7 +3155,9 @@ export const UserUncheckedUpdateWithoutProductInputSchema: z.ZodType<Prisma.User
   connectedAccountId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   stripeConnectedLinked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   Subscription: z.lazy(() => SubscriptionUncheckedUpdateOneWithoutUserNestedInputSchema).optional(),
-  notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
+  notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  reservations: z.lazy(() => ReservationUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
+  bookings: z.lazy(() => ReservationUncheckedUpdateManyWithoutBookedByUserNestedInputSchema).optional()
 }).strict() as z.ZodType<Prisma.UserUncheckedUpdateWithoutProductInput>;
 
 export const ProductCreateManyUserInputSchema: z.ZodType<Prisma.ProductCreateManyUserInput> = z.object({
@@ -2485,6 +3178,26 @@ export const NotificationCreateManyUserInputSchema: z.ZodType<Prisma.Notificatio
   createdAt: z.coerce.date().optional(),
   isRead: z.boolean().optional()
 }).strict() as z.ZodType<Prisma.NotificationCreateManyUserInput>;
+
+export const ReservationCreateManyUserInputSchema: z.ZodType<Prisma.ReservationCreateManyUserInput> = z.object({
+  id: z.string().uuid().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  timeSlot: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  bookedById: z.string()
+}).strict() as z.ZodType<Prisma.ReservationCreateManyUserInput>;
+
+export const ReservationCreateManyBookedByUserInputSchema: z.ZodType<Prisma.ReservationCreateManyBookedByUserInput> = z.object({
+  id: z.string().uuid().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  timeSlot: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  userId: z.string()
+}).strict() as z.ZodType<Prisma.ReservationCreateManyBookedByUserInput>;
 
 export const ProductUpdateWithoutUserInputSchema: z.ZodType<Prisma.ProductUpdateWithoutUserInput> = z.object({
   id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -2542,6 +3255,66 @@ export const NotificationUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Pr
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   isRead: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict() as z.ZodType<Prisma.NotificationUncheckedUpdateManyWithoutUserInput>;
+
+export const ReservationUpdateWithoutUserInputSchema: z.ZodType<Prisma.ReservationUpdateWithoutUserInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  timeSlot: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  bookedByUser: z.lazy(() => UserUpdateOneRequiredWithoutBookingsNestedInputSchema).optional()
+}).strict() as z.ZodType<Prisma.ReservationUpdateWithoutUserInput>;
+
+export const ReservationUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.ReservationUncheckedUpdateWithoutUserInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  timeSlot: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  bookedById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUncheckedUpdateWithoutUserInput>;
+
+export const ReservationUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma.ReservationUncheckedUpdateManyWithoutUserInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  timeSlot: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  bookedById: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUncheckedUpdateManyWithoutUserInput>;
+
+export const ReservationUpdateWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationUpdateWithoutBookedByUserInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  timeSlot: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  user: z.lazy(() => UserUpdateOneRequiredWithoutReservationsNestedInputSchema).optional()
+}).strict() as z.ZodType<Prisma.ReservationUpdateWithoutBookedByUserInput>;
+
+export const ReservationUncheckedUpdateWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationUncheckedUpdateWithoutBookedByUserInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  timeSlot: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUncheckedUpdateWithoutBookedByUserInput>;
+
+export const ReservationUncheckedUpdateManyWithoutBookedByUserInputSchema: z.ZodType<Prisma.ReservationUncheckedUpdateManyWithoutBookedByUserInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  startDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  timeSlot: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationUncheckedUpdateManyWithoutBookedByUserInput>;
 
 /////////////////////////////////////////
 // ARGS
@@ -2608,6 +3381,68 @@ export const UserFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.UserFindUniqueOrT
   include: UserIncludeSchema.optional(),
   where: UserWhereUniqueInputSchema,
 }).strict() as z.ZodType<Prisma.UserFindUniqueOrThrowArgs>;
+
+export const ReservationFindFirstArgsSchema: z.ZodType<Prisma.ReservationFindFirstArgs> = z.object({
+  select: ReservationSelectSchema.optional(),
+  include: ReservationIncludeSchema.optional(),
+  where: ReservationWhereInputSchema.optional(),
+  orderBy: z.union([ ReservationOrderByWithRelationInputSchema.array(),ReservationOrderByWithRelationInputSchema ]).optional(),
+  cursor: ReservationWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ReservationScalarFieldEnumSchema,ReservationScalarFieldEnumSchema.array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationFindFirstArgs>;
+
+export const ReservationFindFirstOrThrowArgsSchema: z.ZodType<Prisma.ReservationFindFirstOrThrowArgs> = z.object({
+  select: ReservationSelectSchema.optional(),
+  include: ReservationIncludeSchema.optional(),
+  where: ReservationWhereInputSchema.optional(),
+  orderBy: z.union([ ReservationOrderByWithRelationInputSchema.array(),ReservationOrderByWithRelationInputSchema ]).optional(),
+  cursor: ReservationWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ReservationScalarFieldEnumSchema,ReservationScalarFieldEnumSchema.array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationFindFirstOrThrowArgs>;
+
+export const ReservationFindManyArgsSchema: z.ZodType<Prisma.ReservationFindManyArgs> = z.object({
+  select: ReservationSelectSchema.optional(),
+  include: ReservationIncludeSchema.optional(),
+  where: ReservationWhereInputSchema.optional(),
+  orderBy: z.union([ ReservationOrderByWithRelationInputSchema.array(),ReservationOrderByWithRelationInputSchema ]).optional(),
+  cursor: ReservationWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ ReservationScalarFieldEnumSchema,ReservationScalarFieldEnumSchema.array() ]).optional(),
+}).strict() as z.ZodType<Prisma.ReservationFindManyArgs>;
+
+export const ReservationAggregateArgsSchema: z.ZodType<Prisma.ReservationAggregateArgs> = z.object({
+  where: ReservationWhereInputSchema.optional(),
+  orderBy: z.union([ ReservationOrderByWithRelationInputSchema.array(),ReservationOrderByWithRelationInputSchema ]).optional(),
+  cursor: ReservationWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict() as z.ZodType<Prisma.ReservationAggregateArgs>;
+
+export const ReservationGroupByArgsSchema: z.ZodType<Prisma.ReservationGroupByArgs> = z.object({
+  where: ReservationWhereInputSchema.optional(),
+  orderBy: z.union([ ReservationOrderByWithAggregationInputSchema.array(),ReservationOrderByWithAggregationInputSchema ]).optional(),
+  by: ReservationScalarFieldEnumSchema.array(),
+  having: ReservationScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict() as z.ZodType<Prisma.ReservationGroupByArgs>;
+
+export const ReservationFindUniqueArgsSchema: z.ZodType<Prisma.ReservationFindUniqueArgs> = z.object({
+  select: ReservationSelectSchema.optional(),
+  include: ReservationIncludeSchema.optional(),
+  where: ReservationWhereUniqueInputSchema,
+}).strict() as z.ZodType<Prisma.ReservationFindUniqueArgs>;
+
+export const ReservationFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.ReservationFindUniqueOrThrowArgs> = z.object({
+  select: ReservationSelectSchema.optional(),
+  include: ReservationIncludeSchema.optional(),
+  where: ReservationWhereUniqueInputSchema,
+}).strict() as z.ZodType<Prisma.ReservationFindUniqueOrThrowArgs>;
 
 export const NotificationFindFirstArgsSchema: z.ZodType<Prisma.NotificationFindFirstArgs> = z.object({
   select: NotificationSelectSchema.optional(),
@@ -2897,6 +3732,52 @@ export const UserUpdateManyArgsSchema: z.ZodType<Prisma.UserUpdateManyArgs> = z.
 export const UserDeleteManyArgsSchema: z.ZodType<Prisma.UserDeleteManyArgs> = z.object({
   where: UserWhereInputSchema.optional(),
 }).strict() as z.ZodType<Prisma.UserDeleteManyArgs>;
+
+export const ReservationCreateArgsSchema: z.ZodType<Prisma.ReservationCreateArgs> = z.object({
+  select: ReservationSelectSchema.optional(),
+  include: ReservationIncludeSchema.optional(),
+  data: z.union([ ReservationCreateInputSchema,ReservationUncheckedCreateInputSchema ]),
+}).strict() as z.ZodType<Prisma.ReservationCreateArgs>;
+
+export const ReservationUpsertArgsSchema: z.ZodType<Prisma.ReservationUpsertArgs> = z.object({
+  select: ReservationSelectSchema.optional(),
+  include: ReservationIncludeSchema.optional(),
+  where: ReservationWhereUniqueInputSchema,
+  create: z.union([ ReservationCreateInputSchema,ReservationUncheckedCreateInputSchema ]),
+  update: z.union([ ReservationUpdateInputSchema,ReservationUncheckedUpdateInputSchema ]),
+}).strict() as z.ZodType<Prisma.ReservationUpsertArgs>;
+
+export const ReservationCreateManyArgsSchema: z.ZodType<Prisma.ReservationCreateManyArgs> = z.object({
+  data: z.union([ ReservationCreateManyInputSchema,ReservationCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() as z.ZodType<Prisma.ReservationCreateManyArgs>;
+
+export const ReservationCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ReservationCreateManyAndReturnArgs> = z.object({
+  data: z.union([ ReservationCreateManyInputSchema,ReservationCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() as z.ZodType<Prisma.ReservationCreateManyAndReturnArgs>;
+
+export const ReservationDeleteArgsSchema: z.ZodType<Prisma.ReservationDeleteArgs> = z.object({
+  select: ReservationSelectSchema.optional(),
+  include: ReservationIncludeSchema.optional(),
+  where: ReservationWhereUniqueInputSchema,
+}).strict() as z.ZodType<Prisma.ReservationDeleteArgs>;
+
+export const ReservationUpdateArgsSchema: z.ZodType<Prisma.ReservationUpdateArgs> = z.object({
+  select: ReservationSelectSchema.optional(),
+  include: ReservationIncludeSchema.optional(),
+  data: z.union([ ReservationUpdateInputSchema,ReservationUncheckedUpdateInputSchema ]),
+  where: ReservationWhereUniqueInputSchema,
+}).strict() as z.ZodType<Prisma.ReservationUpdateArgs>;
+
+export const ReservationUpdateManyArgsSchema: z.ZodType<Prisma.ReservationUpdateManyArgs> = z.object({
+  data: z.union([ ReservationUpdateManyMutationInputSchema,ReservationUncheckedUpdateManyInputSchema ]),
+  where: ReservationWhereInputSchema.optional(),
+}).strict() as z.ZodType<Prisma.ReservationUpdateManyArgs>;
+
+export const ReservationDeleteManyArgsSchema: z.ZodType<Prisma.ReservationDeleteManyArgs> = z.object({
+  where: ReservationWhereInputSchema.optional(),
+}).strict() as z.ZodType<Prisma.ReservationDeleteManyArgs>;
 
 export const NotificationCreateArgsSchema: z.ZodType<Prisma.NotificationCreateArgs> = z.object({
   select: NotificationSelectSchema.optional(),
