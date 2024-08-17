@@ -18,7 +18,7 @@ async function sendReservationEmails(reservation: any) {
   const reservationEndDate = reservation.endDate
 
   await sendEmail({
-    from: 'Veye <support@veye.co>',
+    from: 'SaaS Accelerator <support@ainlightened.com>',
     to: [user.email],
     subject: 'New Reservation',
     react: NewReservationEmailEmailTemplate({bookedByUserGiven_name, bookedByUserFamily_name, reservationTimeSlot, reservationStartDate, reservationEndDate}),
@@ -27,7 +27,7 @@ async function sendReservationEmails(reservation: any) {
 
   
   await sendEmail({
-    from: 'Veye <support@veye.co>',
+    from: 'SaaS Accelerator <support@ainlightened.com>',
     to: [bookedByUser.email],
     subject: 'Reservation Confirmation',
     react: ReservationConfirmEmailEmailTemplate({userGiven_name, userFamily_name, reservationTimeSlot, reservationStartDate, reservationEndDate}),

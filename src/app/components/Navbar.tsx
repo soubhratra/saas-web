@@ -29,6 +29,9 @@ export async function Navbar() {
       <div className="container flex items-center justify-between">
         <Link href="/">
           <div className="flex justify-center flex-grow mt-2 mb-3">
+            <h2 className="text-2xl font-extrabold tracking-tighter ">
+              SaaS Accelerator
+            </h2>
           </div>
         </Link>
        

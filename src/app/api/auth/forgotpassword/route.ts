@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     console.log("protocol",protocol);
 
     await sendEmail({
-      from: 'Veye <support@veye.co>',
+      from: 'SaaS Accelerator <support@ainlightened.com>',
       to: [email],
       subject: 'Reset your password',
       react: ResetPasswordTemplate({ email, id , host, protocol}) as React.ReactElement,

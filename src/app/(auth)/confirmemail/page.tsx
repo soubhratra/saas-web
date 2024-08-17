@@ -33,7 +33,7 @@ const ConfirmEmailPage = async ({searchParams }: ConfirmEmailPageProps) => {
       return (
         <EmailVerificationMessageComponent
           title="Account Verified."
-          message="Thank you for signing up to veye.co. Please continue to login."
+          message="Thank you for signing up to SaaS Accelerator. Please continue to login."
           buttonText="Go to login"
           buttonLink="/login"
         />
