@@ -55,7 +55,24 @@ model User {
   stripeConnectedLinked  Boolean  @default(false)
   Product                 Product[]
   notifications          Notification[]       @relation("UserNotifications")
+  reservations  Reservation[] @relation("UserReservations")
+  bookings      Reservation[] @relation("UserBookings")
 }
+
+
+model Reservation {
+  id            String   @id @default(uuid())
+  startDate     DateTime
+  endDate       DateTime
+  timeSlot      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userId        String
+  user          User     @relation("UserReservations", fields: [userId], references: [id])
+  bookedById    String
+  bookedByUser  User     @relation("UserBookings", fields: [bookedById], references: [id])
+}
+
 
 
 model Notification {
