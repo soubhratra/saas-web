@@ -16,7 +16,7 @@ export default async function Home() {
           <div className="max-w-3xl mx-auto text-center">
             <div>
               <h1 className="mt-8 text-3xl font-extrabold tracking-tight lg:text-6xl">
-                Welcome
+                Welcome To SaaS Accelerator
               </h1>
               <p className="max-w-xl mx-auto mt-8 text-base lg:text-xl text-secondary-foreground"></p>
             </div>

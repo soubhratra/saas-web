@@ -6,7 +6,7 @@ export default function ComingSoon() {
     <div>
       <br/>
       <p className="text-sm lg:text-lg text-gray-600 mb-4">This feature is coming soon. Please check back to know more. 
-        Shoot us an <a href="mailto:contact@veye.co" className='underline'>email</a> if you are curious.</p>
+        Shoot us an <a href="mailto:contact@ainlightened.com" className='underline'>email</a> if you are curious.</p>
     </div>
     <br/>
   </div>)

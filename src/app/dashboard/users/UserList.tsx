@@ -76,7 +76,7 @@ export default function UserList() {
               <TableCell>
                 <Button 
                   onClick={() => handleBook(user)}
-                  variant="outline">
+                  variant="default">
                   Book
                 </Button>
               </TableCell>

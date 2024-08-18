@@ -60,7 +60,7 @@ export default async function UsersListPage() {
                   <TableCell>
                     <Link href={`/dashboard/admin/users/${user.id}/`}>
                       <Button
-                        variant="ghost"
+                        variant="default"
                         size="sm"
                         className="font-medium"
                       >

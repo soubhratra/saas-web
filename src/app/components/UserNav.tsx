@@ -51,7 +51,7 @@ export function UserNav({
       <DropdownMenuTrigger asChild>
         <Button className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10 rounded-full">
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback className="text-sm text-primary font-medium leading-none">{initials}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -111,7 +111,7 @@ export function UserNavAdmin({
       <DropdownMenuTrigger asChild>
         <Button className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10 rounded-full">
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback className="text-sm text-primary font-bold leading-none">{initials}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

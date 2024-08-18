@@ -113,6 +113,10 @@ const LoginPage: NextPage = () => {
             <p className="text-sm lg:text-lg mr-2">Forgot Password?</p>
             <Link href="/login/forgotpassword" className="text-primary text-sm lg:text-lg font-semibold">Reset Password</Link>
           </div>
+          <div className="flex items-center pl-5 lg:pl-[65px] pt-2">
+            <p className="text-sm lg:text-lg mr-2">New to SaaS Accelerator?</p>
+            <Link href="/signup" className="text-primary text-sm lg:text-lg font-semibold">Sign up</Link>
+          </div>
         </form>
       </section>
     </Form>

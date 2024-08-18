@@ -25,21 +25,21 @@ export async function POST(request: Request) {
     //   },
     // });
 
-    const account = await digitalMarketPlaceStripe.accounts.create({
-      type: 'express',
-      email: email as string,
-      capabilities: {
-        card_payments: { requested: true },
-        transfers: { requested: true },
-      },
-    });
+    // const account = await digitalMarketPlaceStripe.accounts.create({
+    //   type: 'express',
+    //   email: email as string,
+    //   capabilities: {
+    //     card_payments: { requested: true },
+    //     transfers: { requested: true },
+    //   },
+    // });
 
     const SignupDetails = {
       email: email,
       password: password,
       given_name: given_name,
       family_name: family_name,
-      connectedAccountId: account.id,
+      // connectedAccountId: account.id,
     };
     //server-side validations
     const result = RegisterSchema.safeParse(SignupDetails);
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Something went wrong' }, {status: 400});
     }
 
-    const signupQuery = await createUser(given_name, family_name, email, password,  account.id);
+    const signupQuery = await createUser(given_name, family_name, email, password); //,  account.id);
     const id = signupQuery.id
     
     const headersList = headers();
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     const protocol = headersList.get('x-forwarded-proto') || "";
       
     await sendEmail({
-      from: 'Veye <support@veye.co>',
+      from: 'SaaS Accelerator <support@ainlightened.com>',
       to: [email],
       subject: 'Verify your email address',
       react: VerifyEmailEmailTemplate({ email, id , host, protocol}) as React.ReactElement,

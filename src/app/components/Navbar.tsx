@@ -29,31 +29,36 @@ export async function Navbar() {
       <div className="container flex items-center justify-between">
         <Link href="/">
           <div className="flex justify-center flex-grow mt-2 mb-3">
+            <h2 className="text-2xl font-extrabold tracking-tighter ">
+              SaaS Accelerator
+            </h2>
           </div>
         </Link>
        
         <div className="flex items-center gap-x-5">
-        <Link href="/dashboard/notification" className="relative">
-            <Bell />
-            {hasUnreadNotifications && (
-              <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-            )}
-          </Link>
-          <ThemeToggle />
           {await auth() ? (
-            ((role === 'Support' || role === 'Admin')) ? (
-              <UserNavAdmin
-                email={user?.email as string}
-                givenName={user?.given_name as string}
-                familyName={user?.family_name as string}
-              />
-            ) : (
-              <UserNav
-                email={user?.email as string}
-                givenName={user?.given_name as string}
-                familyName={user?.family_name as string}
-              />
-            )
+            <div className="flex items-center gap-x-5">
+              <Link href="/dashboard/notification" className="relative">
+                <Bell />
+                {hasUnreadNotifications && (
+                  <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                )}
+              </Link>
+              <ThemeToggle />
+              {((role === 'Support' || role === 'Admin')) ? (
+                <UserNavAdmin
+                  email={user?.email as string}
+                  givenName={user?.given_name as string}
+                  familyName={user?.family_name as string}
+                />
+              ) : (
+                <UserNav
+                  email={user?.email as string}
+                  givenName={user?.given_name as string}
+                  familyName={user?.family_name as string}
+                />
+              )}
+            </div>
           ) : (
             <div className="flex items-center gap-x-5">
               <Link href="/login">
@@ -65,7 +70,6 @@ export async function Navbar() {
             </div>
           )}
         </div>
-      
       </div>
     </nav>
   );
