@@ -57,6 +57,7 @@ async function updateData(id: string) {
   }
 
   if (!user?.stripeCustomerId) {
+    console.log("process.env.STRIPE_SECRET_KEY: " + process.env.STRIPE_SECRET_KEY);
     const data = await stripe.customers.create({
       email: user?.email,
     });
