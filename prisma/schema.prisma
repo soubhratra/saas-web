@@ -50,7 +50,7 @@ model User {
   Subscription           Subscription?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @default(now())
-  colorScheme            String               @default("theme-orange")
+  colorScheme            String               @default("theme-blue")
   connectedAccountId     String?  @unique
   stripeConnectedLinked  Boolean  @default(false)
   Product                 Product[]
