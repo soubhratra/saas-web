@@ -3,7 +3,6 @@ import { Roboto } from 'next/font/google'
 import "./globals.css";
 import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from 'sonner';
-import Chatbot from "./components/chatbot";
 import { unstable_noStore as noStore } from "next/cache";
 import prisma from "@/app/lib/db";
 import { auth } from "@/auth";
@@ -38,7 +37,6 @@ export default async function RootLayout({
         // className={`${roboto.className} ${"theme-violet"}`}
         className={`${roboto.className} ${user?.colorScheme ?? "theme-default"}`}
       >
-        <Chatbot/>
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         <ThemeProvider
           attribute="class"

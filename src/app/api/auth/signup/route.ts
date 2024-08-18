@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     const protocol = headersList.get('x-forwarded-proto') || "";
       
     await sendEmail({
-      from: 'Veye <support@veye.co>',
+      from: 'SaaS Accelerator <support@ainlightened.com>',
       to: [email],
       subject: 'Verify your email address',
       react: VerifyEmailEmailTemplate({ email, id , host, protocol}) as React.ReactElement,

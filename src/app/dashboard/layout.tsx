@@ -7,6 +7,7 @@ import { Navbar } from "@/app/components/Navbar";
 import { auth } from "@/auth";
 import { getUserByEmail } from "../api/auth/data";
 import { stripe } from "../lib/stripe";
+import Chatbot from "../components/chatbot";
 
 async function updateUserRole(email: string) {
   try {
@@ -100,6 +101,7 @@ export default async function DashboardLayout({
         </aside>
         <main>{children}</main>
       </div>
+      <Chatbot/>
     </div>
   );
 }}

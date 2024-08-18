@@ -77,7 +77,7 @@ const Chatbot = () => {
       {isOpen ? (
         <div className=" border dark:bg-black  rounded-lg shadow-lg p-4 max-w-md">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold">Veye Help</h2>
+            <h2 className="text-lg font-bold">SaaS Accelerator Help</h2>
             <Button
               className="text-gray-500 hover:text-gray-700"
               onClick={toggleChatbot}

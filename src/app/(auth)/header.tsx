@@ -5,10 +5,14 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <div className="flex h-20 w-full items-end rounded-lg p-3 md:h-20 max-w-[400px] mx-auto mt-9 lg:mt-12 mb-6 lg:mb-9">
-      <div className="w-full text-white pl-20">
-        {/* <Link href="/">Home</Link> */}
-      </div>
-    </div>
+    <>
+      <Link href="/">
+        <div className="border-b h-[10vh] flex justify-center items-center flex-grow mt-2 mb-3">
+          <h2 className="text-2xl font-extrabold tracking-tighter ">
+            SaaS Accelerator
+          </h2>
+        </div>
+      </Link>
+    </>
   );
 }
