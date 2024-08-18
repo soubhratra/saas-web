@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from "sonner";
 import { NextPage } from 'next';
+import Link from 'next/link';
 
 const  SignupForm: NextPage = () => {
   const router = useRouter();
@@ -203,9 +204,13 @@ const  SignupForm: NextPage = () => {
           </div>
           <Button className="cursor-pointer rounded-lg py-4 px-6 mt-4 self-stretch h-12 lg:mb-6 flex flex-row items-center justify-center box-border gap-[8px]">
             <b className="relative lg:text-lg leading-[28px] text-center">
-              Sign in
+              Sign up
             </b>
           </Button>
+          <div className="flex items-center pl-5 lg:pl-[65px] pt-2">
+            <p className="text-sm lg:text-lg mr-2">Already have an account?</p>
+            <Link href="/login" className="text-primary text-sm lg:text-lg font-semibold">Login</Link>
+          </div>
         </form>
       </section>
     </Form>

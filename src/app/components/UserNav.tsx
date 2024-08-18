@@ -111,7 +111,7 @@ export function UserNavAdmin({
       <DropdownMenuTrigger asChild>
         <Button className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10 rounded-full">
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback className="text-sm text-red-500 font-medium leading-none">{initials}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
